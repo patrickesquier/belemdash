@@ -1,0 +1,123 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  category    String
+  quantity    Int
+  price       Float
+  costPrice   Float
+  sku         String
+  condition   String
+  lastUpdated DateTime @default(now())
+  isService   Boolean  @default(false)
+}
+
+model Customer {
+  id           String   @id @default(cuid())
+  name         String
+  email        String?
+  phone        String?
+  cpf          String?
+  address      String?
+  totalSpent   Float    @default(0)
+  lastPurchase DateTime?
+  createdAt    DateTime @default(now())
+  sales        Sale[]
+}
+
+model Sale {
+  id            String             @id @default(cuid())
+  totalValue    Float
+  discount      Float
+  finalValue    Float
+  seller        String
+  customerName  String?
+  customerEmail String?
+  customerCPF   String?
+  customerPhone String?
+  paymentMethod String
+  timestamp     DateTime           @default(now())
+  status        String             @default("active")
+  items         SaleItem[]
+  history       SaleHistoryEntry[]
+  customer      Customer?          @relation(fields: [customerId], references: [id])
+  customerId    String?
+}
+
+model SaleItem {
+  id         String @id @default(cuid())
+  productId  String
+  name       String
+  quantity   Int
+  unitPrice  Float
+  costPrice  Float?
+  priceType  String
+  warranty   String
+  total      Float
+  sale       Sale   @relation(fields: [saleId], references: [id])
+  saleId     String
+}
+
+model SaleHistoryEntry {
+  id            String   @id @default(cuid())
+  timestamp     DateTime @default(now())
+  userId        String
+  userName      String
+  action        String
+  details       String
+  previousState String?  @db.Text
+  sale          Sale     @relation(fields: [saleId], references: [id])
+  saleId        String
+}
+
+model ServiceOrder {
+  id                 String   @id @default(cuid())
+  customerName       String
+  customerPhone      String?
+  customerCPF        String?
+  equipment          String
+  serialNumber       String?
+  problemDescription String
+  status             String
+  priority           String
+  entryDate          DateTime @default(now())
+  deliveryDate       DateTime?
+  technician         String?
+  estimatedCost      Float?
+  observations       String?
+  servicePerformed   String?
+  items              Json?    // Store nested SaleItem-like structures as JSON for simplicity if needed, or define another relation
+}
+
+model User {
+  id       String @id @default(cuid())
+  username String @unique
+  password String
+  role     String
+  name     String
+}
+
+model LogEntry {
+  id        String   @id @default(cuid())
+  timestamp DateTime @default(now())
+  userId    String
+  userName  String
+  action    String
+  details   String
+  payload   Json?
+}
+
+model Setting {
+  key   String @id
+  value String
+}
