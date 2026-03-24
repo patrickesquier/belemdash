@@ -147,7 +147,41 @@ protectedRouter.delete("/products/:id", checkRole(['admin']), async (req, res) =
   res.json({ success: true });
 });
 
-// Sales
+// Sellers
+protectedRouter.get("/sellers", async (req, res) => {
+  const sellers = await prisma.seller.findMany({
+    orderBy: { name: 'asc' }
+  });
+  res.json(sellers);
+});
+
+protectedRouter.post("/sellers", async (req, res) => {
+  const s = req.body;
+  await prisma.seller.upsert({
+    where: { id: s.id || 'new' },
+    update: {
+      name: s.name,
+      email: s.email,
+      phone: s.phone
+    },
+    create: {
+      id: s.id || undefined,
+      name: s.name,
+      email: s.email,
+      phone: s.phone
+    },
+  });
+  res.json({ success: true });
+});
+
+protectedRouter.delete("/sellers/:id", checkRole(['admin']), async (req, res) => {
+  await prisma.seller.delete({
+    where: { id: req.params.id }
+  });
+  res.json({ success: true });
+});
+
+// Customers
 protectedRouter.get("/sales", async (req, res) => {
   const sales = await prisma.sale.findMany({
     include: {

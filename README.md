@@ -42,6 +42,12 @@ docker-compose up -d
 # Instalar dependências
 npm install
 
+# Garantir que o banco de dados está sincronizado (Cria tabelas se o banco estiver vazio)
+npx prisma db push
+
+# OU, se desejar rodar as migrações oficiais:
+# npx prisma migrate dev
+
 # Gerar o Prisma Client
 npx prisma generate
 
@@ -81,6 +87,13 @@ O sistema oferece ferramentas poderosas para gerenciamento direto:
 
 ---
 
+## ⚠️ Solução de Problemas Comuns
+
+### Erro 403 (Forbidden) após Reset do Banco
+Se você deletar os volumes do Docker (`docker compose down -v`) e reiniciar o sistema, o seu navegador pode tentar usar um token antigo.
+**Solução:** Recarregue a página (F5). O sistema detectará o erro e fará o logout automático, permitindo que você crie uma nova conta.
+
+---
 ## 🔄 Inicialização Automática (Windows)
 
 Para que o sistema inicie sozinho com o Windows:

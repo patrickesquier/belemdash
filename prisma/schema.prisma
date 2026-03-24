@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -23,15 +20,15 @@ model Product {
 }
 
 model Customer {
-  id           String   @id @default(cuid())
+  id           String    @id @default(cuid())
   name         String
   email        String?
   phone        String?
   cpf          String?
   address      String?
-  totalSpent   Float    @default(0)
+  totalSpent   Float     @default(0)
   lastPurchase DateTime?
-  createdAt    DateTime @default(now())
+  createdAt    DateTime  @default(now())
   sales        Sale[]
 }
 
@@ -48,24 +45,26 @@ model Sale {
   paymentMethod String
   timestamp     DateTime           @default(now())
   status        String             @default("active")
-  items         SaleItem[]
-  history       SaleHistoryEntry[]
-  customer      Customer?          @relation(fields: [customerId], references: [id])
   customerId    String?
+  customer      Customer?          @relation(fields: [customerId], references: [id])
+  history       SaleHistoryEntry[]
+  items         SaleItem[]
+  sellerId      String?
+  sellerRef     Seller?            @relation(fields: [sellerId], references: [id])
 }
 
 model SaleItem {
-  id         String @id @default(cuid())
-  productId  String
-  name       String
-  quantity   Int
-  unitPrice  Float
-  costPrice  Float?
-  priceType  String
-  warranty   String
-  total      Float
-  sale       Sale   @relation(fields: [saleId], references: [id])
-  saleId     String
+  id        String @id @default(cuid())
+  productId String
+  name      String
+  quantity  Int
+  unitPrice Float
+  costPrice Float?
+  priceType String
+  warranty  String
+  total     Float
+  saleId    String
+  sale      Sale   @relation(fields: [saleId], references: [id])
 }
 
 model SaleHistoryEntry {
@@ -75,13 +74,13 @@ model SaleHistoryEntry {
   userName      String
   action        String
   details       String
-  previousState String?  @db.Text
-  sale          Sale     @relation(fields: [saleId], references: [id])
+  previousState String?
   saleId        String
+  sale          Sale     @relation(fields: [saleId], references: [id])
 }
 
 model ServiceOrder {
-  id                 String   @id @default(cuid())
+  id                 String    @id @default(cuid())
   customerName       String
   customerPhone      String?
   customerCPF        String?
@@ -90,13 +89,13 @@ model ServiceOrder {
   problemDescription String
   status             String
   priority           String
-  entryDate          DateTime @default(now())
+  entryDate          DateTime  @default(now())
   deliveryDate       DateTime?
   technician         String?
   estimatedCost      Float?
   observations       String?
   servicePerformed   String?
-  items              Json?    // Store nested SaleItem-like structures as JSON for simplicity if needed, or define another relation
+  items              Json?
 }
 
 model User {
@@ -120,4 +119,12 @@ model LogEntry {
 model Setting {
   key   String @id
   value String
+}
+
+model Seller {
+  id    String  @id @default(cuid())
+  name  String  @unique
+  email String?
+  phone String?
+  sales Sale[]
 }

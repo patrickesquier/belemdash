@@ -173,7 +173,7 @@ const Dashboard: React.FC = () => {
         )}>
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-black uppercase tracking-tight">Mais Vendidos</h3>
-            <button 
+            <button
               onClick={() => setActiveTab('inventory')}
               className="text-[10px] font-black uppercase tracking-widest text-blue-500 hover:underline"
             >
@@ -207,7 +207,7 @@ const Dashboard: React.FC = () => {
               <AlertCircle className="text-red-500" size={20} />
               <h3 className="text-lg font-black uppercase tracking-tight text-red-500">Alertas de Estoque</h3>
             </div>
-            <button 
+            <button
               onClick={() => {
                 setSearchQuery('');
                 setActiveTab('inventory');

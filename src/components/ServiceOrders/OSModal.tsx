@@ -26,6 +26,18 @@ const OSModal: React.FC = () => {
     showNotification
   } = useApp();
 
+  const [priority, setPriority] = React.useState<'Baixa' | 'Média' | 'Alta'>(
+    (editingOS?.priority as any) || 'Média'
+  );
+
+  useEffect(() => {
+    if (editingOS) {
+      setPriority((editingOS.priority as any) || 'Média');
+    } else {
+      setPriority('Média');
+    }
+  }, [editingOS]);
+
   useEffect(() => {
     if (osCustomerCPF.length >= 11) {
       const customer = customers.find(c => c.cpf === osCustomerCPF || c.cpf?.replace(/\D/g, '') === osCustomerCPF.replace(/\D/g, ''));
@@ -92,7 +104,7 @@ const OSModal: React.FC = () => {
       serialNumber: formData.get('serialNumber') as string,
       problemDescription: formData.get('problemDescription') as string,
       status: formData.get('status') as any,
-      priority: formData.get('priority') as any,
+      priority: priority,
       technician: formData.get('technician') as string,
       estimatedCost: Number(formData.get('estimatedCost')),
       observations: formData.get('observations') as string,
@@ -224,6 +236,19 @@ const OSModal: React.FC = () => {
                     placeholder="Descreva o que está acontecendo..."
                   />
                 </div>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold uppercase text-zinc-500 ml-1">Observações Internas</label>
+                  <textarea
+                    name="observations"
+                    defaultValue={editingOS?.observations}
+                    rows={2}
+                    className={cn(
+                      "w-full px-4 py-3 rounded-xl border outline-none transition-all text-sm resize-none",
+                      isDarkMode ? "bg-zinc-800 border-zinc-700 focus:border-blue-500" : "bg-zinc-50 border-zinc-200 focus:border-blue-500"
+                    )}
+                    placeholder="Notas internas ou acessórios deixados..."
+                  />
+                </div>
                 {editingOS && (
                   <div className="space-y-1.5">
                     <label className="text-[10px] font-bold uppercase text-zinc-500 ml-1 text-emerald-500">Serviço Realizado</label>
@@ -328,12 +353,17 @@ const OSModal: React.FC = () => {
                         <button
                           key={p}
                           type="button"
+                          onClick={() => setPriority(p)}
                           className={cn(
                             "flex-1 py-2 rounded-xl text-[10px] font-black uppercase transition-all border",
-                            p === 'Alta' && "border-red-500/30 text-red-500 bg-red-500/5",
-                            p === 'Média' && "border-amber-500/30 text-amber-500 bg-amber-500/5",
-                            p === 'Baixa' && "border-emerald-500/30 text-emerald-500 bg-emerald-500/5",
-                            "hover:scale-[1.02] active:scale-[0.98]"
+                            p === priority ? (
+                              p === 'Alta' ? "border-red-500 text-red-500 bg-red-500/20 shadow-lg shadow-red-500/10" :
+                              p === 'Média' ? "border-amber-500 text-amber-500 bg-amber-500/20 shadow-lg shadow-amber-500/10" :
+                              "border-emerald-500 text-emerald-500 bg-emerald-500/20 shadow-lg shadow-emerald-500/10"
+                            ) : (
+                              isDarkMode ? "border-zinc-800 text-zinc-600 bg-zinc-900" : "border-zinc-200 text-zinc-400 bg-white"
+                            ),
+                            "hover:scale-[1.05] active:scale-[0.95]"
                           )}
                         >
                           {p}

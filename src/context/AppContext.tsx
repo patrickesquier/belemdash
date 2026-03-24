@@ -20,7 +20,7 @@ interface AppContextType {
   searchQuery: string;
   debouncedSearchQuery: string;
   enableServices: boolean;
-  
+
   // Modal States
   isDistributorModalOpen: boolean;
   isModalOpen: boolean;
@@ -84,7 +84,7 @@ interface AppContextType {
   setIsDarkMode: React.Dispatch<React.SetStateAction<boolean>>;
   setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
   setEnableServices: React.Dispatch<React.SetStateAction<boolean>>;
-  
+
   setIsDistributorModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setIsSalesModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -139,11 +139,11 @@ interface AppContextType {
   addLog: (action: LogEntry['action'], details: string, payload?: any) => Promise<void>;
   saveSetting: (key: string, value: string) => Promise<void>;
   handleLogout: () => void;
-  
+
   // Stats
   stats: any;
   filteredProducts: Product[];
-  
+
   // Notifications state
   notification: { message: string; type: 'success' | 'error' } | null;
   setNotification: React.Dispatch<React.SetStateAction<{ message: string; type: 'success' | 'error' } | null>>;
@@ -209,13 +209,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [newUserRole, setNewUserRole] = useState<'admin' | 'supervisor' | 'user'>('user');
 
   // Settings
-  const [distributorName, setDistributorName] = useState('SIDNEY DISTRIBUIDORA');
+  const [distributorName, setDistributorName] = useState('BELEMTI');
   const [distributorLogo, setDistributorLogo] = useState<string | null>(null);
   const [distributorLogoBlend, setDistributorLogoBlend] = useState<'normal' | 'multiply' | 'screen'>('normal');
   const [distributorIcon, setDistributorIcon] = useState('Shield');
   const [distributorColor, setDistributorColor] = useState('#3b82f6');
-  const [distributorDescription, setDistributorDescription] = useState('Distribuição e Comércio de Produtos');
-  const [distributorLabel, setDistributorLabel] = useState('Distribuidor');
+  const [distributorDescription, setDistributorDescription] = useState('VEM PRA CÁ QUE AGENTE RESOLVE');
+  const [distributorLabel, setDistributorLabel] = useState('');
   const [appName, setAppName] = useState('ESTOQUE FÁCIL');
   const [appIcon, setAppIcon] = useState('Shield');
   const [lowStockThreshold, setLowStockThreshold] = useState<number>(5);
@@ -244,14 +244,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setIsDataLoaded(true);
         return;
       }
-      
+
       try {
         const fetchJson = async (url: string) => {
           const res = await fetchWithAuth(url);
           if (!res.ok) {
-            if (res.status === 401) {
+            if (res.status === 401 || res.status === 403) {
               handleLogout();
-              throw new Error('Unauthorized');
+              throw new Error('Sessão expirada ou inválida');
             }
             throw new Error(`Error fetching ${url}: ${res.statusText}`);
           }
@@ -496,9 +496,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         paymentMethod,
         timestamp: new Date().toISOString()
       };
-      setSales(prev => prev.map(s => s.id === editingSale.id ? sale : s));
-      showNotification('Venda atualizada com sucesso!');
-      addLog('update_sale', `Venda ${sale.id} atualizada`, sale);
     } else {
       sale = {
         id: Math.random().toString(36).substr(2, 9),
@@ -515,49 +512,66 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         timestamp: new Date().toISOString(),
         status: 'active'
       };
+    }
 
-      const updatedProducts = products.map(p => {
-        const item = cart.find(i => i.productId === p.id);
-        if (item && !p.isService) {
-          return { ...p, quantity: p.quantity - item.quantity };
-        }
-        return p;
+    try {
+      const res = await fetchWithAuth('/api/sales', {
+        method: 'POST',
+        body: JSON.stringify(sale)
       });
-      setProducts(updatedProducts);
 
-      setSales(prev => [sale, ...prev]);
-      showNotification('Venda realizada com sucesso!');
-      addLog('create_sale', `Venda ${sale.id} realizada`, sale);
+      if (!res.ok) {
+        throw new Error(`Erro ao salvar venda: ${res.statusText}`);
+      }
+
+      if (editingSale) {
+        setSales(prev => prev.map(s => s.id === editingSale.id ? sale : s));
+        showNotification('Venda atualizada com sucesso!');
+        addLog('update_sale', `Venda ${sale.id} atualizada`, sale);
+      } else {
+        setSales(prev => [sale, ...prev]);
+        showNotification('Venda realizada com sucesso!');
+        addLog('create_sale', `Venda ${sale.id} realizada`, sale);
+
+        // Update product quantities locally
+        const updatedProducts = products.map(p => {
+          const item = (cart as any).find((i: any) => i.productId === p.id);
+          if (item && !p.isService) {
+            return { ...p, quantity: p.quantity - item.quantity };
+          }
+          return p;
+        });
+        setProducts(updatedProducts);
+
+        if (window.confirm('Venda realizada! Deseja imprimir o comprovante/garantia?')) {
+          printSaleReceipt(
+            sale,
+            distributorName,
+            distributorDescription,
+            distributorLabel,
+            distributorLogo || null,
+            distributorIcon,
+            distributorColor,
+            warrantyTerm,
+            distributorLogoBlend
+          );
+        }
+      }
+
+      setIsSalesModalOpen(false);
+      setEditingSale(null);
+      setCart([]);
+      setSellerName('');
+      setCustomerName('');
+      setCustomerEmail('');
+      setCustomerCPF('');
+      setCustomerPhone('');
+      setDiscount(0);
+
+    } catch (err) {
+      console.error('Failed to save sale', err);
+      showNotification('Erro ao salvar venda no servidor. Verifique sua conexão.', 'error');
     }
-
-    await fetchWithAuth('/api/sales', {
-      method: 'POST',
-      body: JSON.stringify(sale)
-    });
-
-    if (!editingSale && window.confirm('Venda realizada! Deseja imprimir o comprovante/garantia?')) {
-      printSaleReceipt(
-        sale,
-        distributorName,
-        distributorDescription,
-        distributorLabel,
-        distributorLogo || null,
-        distributorIcon,
-        distributorColor,
-        warrantyTerm,
-        distributorLogoBlend
-      );
-    }
-
-    setIsSalesModalOpen(false);
-    setEditingSale(null);
-    setCart([]);
-    setSellerName('');
-    setCustomerName('');
-    setCustomerEmail('');
-    setCustomerCPF('');
-    setCustomerPhone('');
-    setDiscount(0);
   };
 
   const handleDeleteCustomer = async (id: string) => {
@@ -580,9 +594,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     let customer: Customer;
     if (editingCustomer) {
       customer = { ...editingCustomer, ...customerData } as Customer;
-      setCustomers(prev => prev.map(c => c.id === editingCustomer.id ? customer : c));
-      addLog('update_customer', `Cliente atualizado: ${customerData.name}`, { id: editingCustomer.id, ...customerData });
-      showNotification('Cliente atualizado com sucesso');
     } else {
       customer = {
         id: Math.random().toString(36).substr(2, 9),
@@ -594,18 +605,35 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         totalSpent: 0,
         createdAt: new Date().toISOString(),
       };
-      setCustomers(prev => [customer, ...prev]);
-      addLog('create_customer', `Novo cliente cadastrado: ${customer.name}`, customer);
-      showNotification('Cliente cadastrado com sucesso');
     }
 
-    await fetchWithAuth('/api/customers', {
-      method: 'POST',
-      body: JSON.stringify(customer)
-    });
+    try {
+      const res = await fetchWithAuth('/api/customers', {
+        method: 'POST',
+        body: JSON.stringify(customer)
+      });
 
-    setIsCustomerModalOpen(false);
-    setEditingCustomer(null);
+      if (!res.ok) {
+        throw new Error(`Erro ao salvar cliente: ${res.statusText}`);
+      }
+
+      if (editingCustomer) {
+        setCustomers(prev => prev.map(c => c.id === editingCustomer.id ? customer : c));
+        showNotification('Cliente atualizado com sucesso');
+        addLog('update_customer', `Cliente atualizado: ${customerData.name}`, { id: editingCustomer.id, ...customerData });
+      } else {
+        setCustomers(prev => [customer, ...prev]);
+        showNotification('Cliente cadastrado com sucesso');
+        addLog('create_customer', `Novo cliente cadastrado: ${customer.name}`, customer);
+      }
+
+      setIsCustomerModalOpen(false);
+      setEditingCustomer(null);
+
+    } catch (err) {
+      console.error('Failed to save customer', err);
+      showNotification('Erro ao salvar no servidor. Verifique sua conexão.', 'error');
+    }
   };
 
   const handleDeleteOS = async (id: string) => {
@@ -626,7 +654,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const { printServiceOrder, printServiceReceipt } = await import('../utils/print');
 
     let os: ServiceOrder;
-    if (editingOS) {
+    const isEditing = !!editingOS;
+
+    if (isEditing && editingOS) {
       os = {
         ...editingOS,
         ...osData,
@@ -635,13 +665,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         customerCPF: osCustomerCPF,
         items: osItems
       } as ServiceOrder;
-      setServiceOrders(prev => prev.map(o => o.id === editingOS.id ? os : o));
-      addLog('update_os', `OS atualizada: ${osData.equipment} - ${osCustomerName}`, { id: editingOS.id, ...osData });
-      showNotification('Ordem de Serviço atualizada com sucesso');
-
-      if (os.status === 'Concluído' || os.status === 'Entregue') {
-        printServiceReceipt(os, distributorName, distributorDescription, distributorLabel, distributorLogo, distributorIcon, distributorColor, warrantyTerm, distributorLogoBlend);
-      }
     } else {
       os = {
         id: `OS-${Math.random().toString(36).substr(2, 6).toUpperCase()}`,
@@ -656,31 +679,52 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         entryDate: osData.entryDate || new Date().toISOString(),
         technician: osData.technician,
         estimatedCost: osData.estimatedCost,
-        observations: osData.observations,
+        observations: osData.observations || '',
+        servicePerformed: osData.servicePerformed || '',
         items: osItems,
       };
-      setServiceOrders(prev => [os, ...prev]);
-      addLog('create_os', `Nova OS gerada: ${os.equipment} - ${os.customerName}`, os);
-      showNotification('Ordem de Serviço gerada com sucesso');
+    }
 
-      printServiceOrder(os, distributorName, distributorDescription, distributorLabel, distributorLogo, distributorIcon, distributorColor, distributorLogoBlend);
+    try {
+      const res = await fetchWithAuth('/api/service-orders', {
+        method: 'POST',
+        body: JSON.stringify(os)
+      });
 
+      if (!res.ok) {
+        throw new Error(`Erro ao salvar OS: ${res.statusText}`);
+      }
+
+      // Only update local state if API succeeded
+      if (isEditing) {
+        setServiceOrders(prev => prev.map(o => o.id === (editingOS as ServiceOrder).id ? os : o));
+        showNotification('Ordem de Serviço atualizada com sucesso');
+        addLog('update_os', `OS atualizada: ${os.equipment} - ${os.customerName}`, { id: os.id, ...osData });
+      } else {
+        setServiceOrders(prev => [os, ...prev]);
+        showNotification('Ordem de Serviço gerada com sucesso');
+        addLog('create_os', `Nova OS gerada: ${os.equipment} - ${os.customerName}`, os);
+
+        // Auto-print only for new OS
+        printServiceOrder(os, distributorName, distributorDescription, distributorLabel, distributorLogo, distributorIcon, distributorColor, distributorLogoBlend);
+      }
+
+      // Print receipt if completed
       if (os.status === 'Concluído' || os.status === 'Entregue') {
         printServiceReceipt(os, distributorName, distributorDescription, distributorLabel, distributorLogo, distributorIcon, distributorColor, warrantyTerm, distributorLogoBlend);
       }
+
+      setIsOSModalOpen(false);
+      setEditingOS(null);
+      setOsCustomerName('');
+      setOsCustomerPhone('');
+      setOsCustomerCPF('');
+      setOsItems([]);
+
+    } catch (err) {
+      console.error('Failed to save OS', err);
+      showNotification('Erro ao salvar no servidor. Verifique sua conexão.', 'error');
     }
-
-    await fetchWithAuth('/api/service-orders', {
-      method: 'POST',
-      body: JSON.stringify(os)
-    });
-
-    setIsOSModalOpen(false);
-    setEditingOS(null);
-    setOsCustomerName('');
-    setOsCustomerPhone('');
-    setOsCustomerCPF('');
-    setOsItems([]);
   };
 
   const handleSaveUser = async () => {
@@ -757,14 +801,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         method: 'POST',
         body: JSON.stringify(data)
       });
-      
+
       setProducts(data.products || []);
       setSales(data.sales || []);
       setCustomers(data.customers || []);
       setServiceOrders(data.serviceOrders || []);
       setUsers(data.users || []);
       setLogs(data.logs || []);
-      
+
       showNotification('Backup restaurado com sucesso');
       addLog('system_restore', 'Backup do sistema restaurado');
     } catch (err) {
@@ -929,8 +973,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }).reverse();
 
     return {
-      totalValue, totalItems, lowStock: safeProducts.filter(p => !p.isService && p.quantity <= lowStockThreshold).length, 
-      lowStockProducts, monthlyProfit, paymentData, topProducts, last7Days, 
+      totalValue, totalItems, lowStock: safeProducts.filter(p => !p.isService && p.quantity <= lowStockThreshold).length,
+      lowStockProducts, monthlyProfit, paymentData, topProducts, last7Days,
       totalRevenue, monthlyRevenue, totalCustomers, pendingOS
     };
   }, [products, sales, customers, serviceOrders]);
@@ -950,7 +994,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setIsDarkMode, setActiveTab, setSearchQuery, setEnableServices,
     setIsDistributorModalOpen, setIsModalOpen, setIsSalesModalOpen, setIsCustomerModalOpen, setIsOSModalOpen, setIsUserModalOpen, setIsLogsModalOpen,
     setIsCalculatorOpen, setIsNotificationsOpen,
-    setEditingProduct, setEditingSale, setEditingCustomer, setEditingOS, setEditingUser, setCart, setSellerName, 
+    setEditingProduct, setEditingSale, setEditingCustomer, setEditingOS, setEditingUser, setCart, setSellerName,
     setCustomerName, setCustomerEmail, setCustomerCPF, setCustomerPhone, setPaymentMethod, setDiscount,
     setOsCustomerName, setOsCustomerPhone, setOsCustomerCPF, setOsItems,
     setNewUserName, setNewUserUsername, setNewUserPassword, setNewUserRole, setLowStockThreshold,

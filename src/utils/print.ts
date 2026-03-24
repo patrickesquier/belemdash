@@ -52,26 +52,28 @@ export const printInventory = (
     <head>
       <title>Relatório de Inventário</title>
       <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
-        body { font-family: 'Inter', Arial, sans-serif; color: #000; margin: 0; padding: 20px; line-height: 1.4; font-size: 11px; }
-        .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
-        .company-info { display: flex; align-items: center; gap: 15px; }
-        .company-logo-header { max-width: 60px; max-height: 60px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); mix-blend-mode: multiply; }
-        .company-info h1 { margin: 0; color: #000; font-size: 20px; font-weight: bold; }
-        .company-info p { margin: 2px 0; font-size: 10px; color: #333; }
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap');
+        body { font-family: 'Outfit', Arial, sans-serif; color: #1f2937; margin: 0; padding: 40px; line-height: 1.5; font-size: 11px; }
+        .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #111827; padding-bottom: 20px; margin-bottom: 25px; }
+        .company-info { display: flex; align-items: center; gap: 20px; }
+        .company-logo-header { max-width: 80px; max-height: 80px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); mix-blend-mode: ${logoBlend}; }
+        .company-info h1 { margin: 0; color: #111827; font-size: 24px; font-weight: 900; letter-spacing: -0.025em; }
+        .company-info p { margin: 4px 0; font-size: 11px; color: #6b7280; font-weight: 500; }
         .document-title { text-align: right; }
-        .document-title h2 { margin: 0; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
+        .document-title h2 { margin: 0; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; font-weight: 900; color: #111827; }
+        .document-title p { margin: 5px 0 0; color: #6b7280; font-weight: 600; font-size: 10px; }
         
-        table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
-        th { background: #f0f0f0; padding: 6px; text-align: left; font-size: 10px; text-transform: uppercase; color: #000; border: 1px solid #ddd; }
-        td { padding: 6px; border: 1px solid #ddd; font-size: 10px; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: 20px; border: 1px solid #f1f5f9; border-radius: 12px; overflow: hidden; }
+        th { background: #f9fafb; padding: 12px; text-align: left; font-size: 10px; text-transform: uppercase; color: #6b7280; border-bottom: 1px solid #f1f5f9; font-weight: 900; }
+        td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 10px; color: #374151; font-weight: 500; }
+        tr:last-child td { border-bottom: none; }
         
-        .summary { display: flex; justify-content: flex-end; gap: 40px; margin-top: 20px; padding: 15px; background: #f9f9f9; border-radius: 4px; }
+        .summary { display: flex; justify-content: flex-end; gap: 40px; margin-top: 30px; padding: 25px; background: #f9fafb; border-radius: 20px; border: 1px solid #f1f5f9; }
         .summary-item { text-align: right; }
-        .summary-label { font-size: 10px; color: #666; text-transform: uppercase; font-weight: bold; }
-        .summary-value { font-size: 16px; font-weight: bold; color: #000; }
+        .summary-label { font-size: 9px; color: #9ca3af; text-transform: uppercase; font-weight: 900; letter-spacing: 0.05em; margin-bottom: 5px; }
+        .summary-value { font-size: 20px; font-weight: 900; color: #111827; }
         
-        .footer { margin-top: 30px; text-align: center; font-size: 9px; color: #666; border-top: 1px solid #eee; padding-top: 10px; }
+        .footer { margin-top: 50px; text-align: center; font-size: 9px; color: #9ca3af; border-top: 1px solid #f1f5f9; padding-top: 20px; font-weight: 500; }
         
         @media print {
           body { padding: 0; }
@@ -83,14 +85,14 @@ export const printInventory = (
         <div class="company-info">
           ${headerLogoHtml}
           <div>
-            <p style="margin: 0; font-size: 9px; text-transform: uppercase; color: #666; font-weight: bold; letter-spacing: 1px;">${label}</p>
+            <p style="margin: 0; font-size: 10px; text-transform: uppercase; color: #111827; font-weight: 900; letter-spacing: 0.1em;">${label}</p>
             <h1>${distributor}</h1>
             <p>${description}</p>
           </div>
         </div>
         <div class="document-title">
           <h2>Relatório de Inventário</h2>
-          <p>Data: ${date}</p>
+          <p>Emissão: ${date}</p>
         </div>
       </div>
 
@@ -102,7 +104,7 @@ export const printInventory = (
             <th>Categoria</th>
             <th style="text-align: center;">Qtd</th>
             <th style="text-align: right;">Preço Unit.</th>
-            <th>Total</th>
+            <th style="text-align: right;">Subtotal</th>
           </tr>
         </thead>
         <tbody>
@@ -116,13 +118,13 @@ export const printInventory = (
           <div class="summary-value">${totalItems}</div>
         </div>
         <div class="summary-item">
-          <div class="summary-label">Valor Total em Estoque</div>
-          <div class="summary-value">${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalValue)}</div>
+          <div class="summary-label">Valor Total do Patrimônio</div>
+          <div class="summary-value" style="color: #10b981;">${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalValue)}</div>
         </div>
       </div>
 
       <div class="footer">
-        Documento gerado pelo sistema BelemTI em ${new Date().toLocaleString('pt-BR')}
+        Gerado por <span style="font-weight: 900; color: #111827;">ESTOQUE FÁCIL</span> • ${new Date().toLocaleString('pt-BR')} • Página 1 de 1
       </div>
 
       <script>
@@ -174,35 +176,38 @@ export const printServiceOrder = (
     <head>
       <title>Ordem de Serviço Nº ${os.id}</title>
       <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
-        body { font-family: 'Inter', Arial, sans-serif; color: #000; margin: 0; padding: 20px; line-height: 1.4; font-size: 11px; }
-        .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
-        .company-info { display: flex; align-items: center; gap: 15px; }
-        .company-logo-header { max-width: 60px; max-height: 60px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); mix-blend-mode: multiply; }
-        .company-info h1 { margin: 0; color: #000; font-size: 20px; font-weight: bold; }
-        .company-info p { margin: 2px 0; font-size: 10px; color: #333; }
-        .os-badge { text-align: right; background: #000; color: #fff; padding: 10px; border-radius: 4px; }
-        .os-badge h2 { margin: 0; font-size: 12px; font-weight: bold; }
-        .os-badge p { margin: 5px 0 0; font-size: 16px; font-weight: bold; }
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap');
+        body { font-family: 'Outfit', Arial, sans-serif; color: #1f2937; margin: 0; padding: 40px; line-height: 1.5; font-size: 12px; }
+        .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #3b82f6; padding-bottom: 20px; margin-bottom: 25px; }
+        .company-info { display: flex; align-items: center; gap: 20px; }
+        .company-logo-header { max-width: 80px; max-height: 80px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); mix-blend-mode: ${logoBlend}; }
+        .company-info h1 { margin: 0; color: #111827; font-size: 24px; font-weight: 900; letter-spacing: -0.025em; }
+        .company-info p { margin: 4px 0; font-size: 11px; color: #6b7280; font-weight: 500; }
+        .os-badge { text-align: right; background: #3b82f6; color: #fff; padding: 15px 25px; border-radius: 20px; box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.2); }
+        .os-badge h2 { margin: 0; font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.9; }
+        .os-badge p { margin: 5px 0 0; font-size: 20px; font-weight: 900; }
         
-        .section { margin-bottom: 15px; }
-        .section-header { background: #f0f0f0; padding: 5px 10px; font-weight: bold; text-transform: uppercase; font-size: 10px; border-left: 4px solid #000; margin-bottom: 8px; }
-        .section-content { padding: 0 10px; }
+        .section { margin-bottom: 25px; background: #fff; border-radius: 16px; border: 1px solid #f3f4f6; overflow: hidden; }
+        .section-header { background: #f9fafb; padding: 12px 16px; font-weight: 900; text-transform: uppercase; font-size: 10px; color: #374151; border-bottom: 1px solid #f1f5f9; letter-spacing: 0.05em; display: flex; align-items: center; gap: 8px; }
+        .section-header::before { content: ""; display: block; width: 4px; height: 12px; background: #3b82f6; border-radius: 2px; }
+        .section-content { padding: 16px; }
         
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .info-row { margin-bottom: 4px; }
-        .info-label { font-weight: bold; width: 100px; display: inline-block; color: #666; }
-        .problem-box { border: 1px solid #ddd; padding: 10px; min-height: 60px; font-style: italic; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .info-row { margin-bottom: 8px; display: flex; align-items: baseline; gap: 8px; }
+        .info-label { font-weight: 700; font-size: 10px; color: #9ca3af; text-transform: uppercase; min-width: 90px; }
+        .info-value { font-weight: 600; color: #1f2937; }
+        .problem-box { border: 1px solid #e5e7eb; padding: 15px; min-height: 80px; font-style: italic; background: #fefce8; border-radius: 12px; color: #854d0e; font-weight: 500; }
         
-        .status-table { width: 100%; border-collapse: collapse; }
-        .status-table td { padding: 6px; border: 1px solid #ddd; }
-        .status-label { font-weight: bold; background: #f9f9f9; color: #666; width: 120px; }
+        .status-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+        .status-table td { padding: 12px; border: 1px solid #f1f5f9; }
+        .status-label { font-weight: 700; background: #f9fafb; color: #6b7280; width: 120px; font-size: 10px; text-transform: uppercase; }
         
-        .terms { font-size: 9px; color: #666; margin-top: 20px; border: 1px dashed #ccc; padding: 10px; }
-        .signatures { display: flex; justify-content: space-between; margin-top: 40px; }
-        .signature-line { border-top: 1px solid #000; width: 250px; text-align: center; padding-top: 5px; font-size: 9px; font-weight: bold; }
+        .terms { font-size: 9px; color: #6b7280; margin-top: 30px; border: 1px dashed #e5e7eb; padding: 15px; border-radius: 12px; background: #fafafa; }
+        .signatures { display: flex; justify-content: space-between; margin-top: 60px; padding: 0 20px; }
+        .signature-line { border-top: 2px solid #e5e7eb; width: 280px; text-align: center; padding-top: 10px; font-size: 10px; font-weight: 700; color: #4b5563; }
         
-        .footer { margin-top: 20px; text-align: center; font-size: 8px; color: #999; }
+        .footer { margin-top: 40px; text-align: center; font-size: 9px; color: #9ca3af; font-weight: 500; }
+        .highlight { color: #3b82f6; font-weight: 900; }
       </style>
     </head>
     <body onload="window.print()">
@@ -210,7 +215,7 @@ export const printServiceOrder = (
         <div class="company-info">
           ${headerLogoHtml}
           <div>
-            <p style="margin: 0; font-size: 9px; text-transform: uppercase; color: #666; font-weight: bold; letter-spacing: 1px;">${label}</p>
+            <p style="margin: 0; font-size: 10px; text-transform: uppercase; color: #3b82f6; font-weight: 900; letter-spacing: 0.1em;">${label}</p>
             <h1>${distributor}</h1>
             <p>${description}</p>
           </div>
@@ -218,7 +223,7 @@ export const printServiceOrder = (
         <div class="os-badge">
           <h2>ORDEM DE SERVIÇO</h2>
           <p>Nº ${os.id}</p>
-          <p style="font-size: 10px; margin-top: 2px;">Entrada: ${date}</p>
+          <div style="font-size: 10px; margin-top: 8px; font-weight: 700; opacity: 0.9;">Entrada: ${date}</div>
         </div>
       </div>
 
@@ -226,16 +231,16 @@ export const printServiceOrder = (
         <div class="section">
           <div class="section-header">Dados do Cliente</div>
           <div class="section-content">
-            <div class="info-row"><span class="info-label">Nome:</span> <strong>${os.customerName}</strong></div>
-            <div class="info-row"><span class="info-label">Telefone:</span> ${os.customerPhone || 'Não informado'}</div>
-            <div class="info-row"><span class="info-label">CPF/CNPJ:</span> ${os.customerCPF || 'Não informado'}</div>
+            <div class="info-row"><span class="info-label">Nome:</span> <span class="info-value">${os.customerName}</span></div>
+            <div class="info-row"><span class="info-label">Telefone:</span> <span class="info-value">${os.customerPhone || 'Não informado'}</span></div>
+            <div class="info-row"><span class="info-label">CPF/CNPJ:</span> <span class="info-value">${os.customerCPF || 'Não informado'}</span></div>
           </div>
         </div>
         <div class="section">
           <div class="section-header">Dados do Equipamento</div>
           <div class="section-content">
-            <div class="info-row"><span class="info-label">Equipamento:</span> <strong>${os.equipment}</strong></div>
-            <div class="info-row"><span class="info-label">Nº de Série:</span> ${os.serialNumber || 'Não informado'}</div>
+            <div class="info-row"><span class="info-label">Aparelho:</span> <span class="info-value highlight">${os.equipment}</span></div>
+            <div class="info-row"><span class="info-label">Nº de Série:</span> <span class="info-value">${os.serialNumber || 'Não informado'}</span></div>
           </div>
         </div>
       </div>
@@ -249,19 +254,19 @@ export const printServiceOrder = (
 
       <div class="section">
         <div class="section-header">Detalhes Técnicos e Status</div>
-        <div class="section-content">
+        <div class="section-content" style="padding: 0;">
           <table class="status-table">
             <tr>
-              <td class="status-label">Status Atual:</td>
-              <td><strong>${os.status.toUpperCase()}</strong></td>
+              <td class="status-label">Status Inicial:</td>
+              <td><strong style="color: #3b82f6;">${os.status.toUpperCase()}</strong></td>
               <td class="status-label">Prioridade:</td>
-              <td>${os.priority}</td>
+              <td><strong>${os.priority}</strong></td>
             </tr>
             <tr>
-              <td class="status-label">Técnico:</td>
+              <td class="status-label">Técnico Resp.:</td>
               <td>${os.technician || 'A definir'}</td>
               <td class="status-label">Custo Est.:</td>
-              <td><strong>${os.estimatedCost ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(os.estimatedCost) : 'A definir'}</strong></td>
+              <td><strong class="highlight">${os.estimatedCost ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(os.estimatedCost) : 'A definir'}</strong></td>
             </tr>
           </table>
         </div>
@@ -270,27 +275,28 @@ export const printServiceOrder = (
       ${os.observations ? `
       <div class="section">
         <div class="section-header">Observações Adicionais</div>
-        <div class="section-content" style="font-size: 10px; color: #333;">
+        <div class="section-content" style="font-size: 11px; color: #4b5563; font-weight: 500;">
           ${os.observations}
         </div>
       </div>
       ` : ''}
 
       <div class="terms">
-        <strong>TERMOS E CONDIÇÕES:</strong> 
-        1. O prazo para orçamento é de até 48 horas úteis. 
-        2. Equipamentos não retirados em até 90 dias após a conclusão do serviço serão considerados abandonados. 
-        3. A garantia cobre apenas os serviços executados e peças substituídas, pelo prazo legal de 90 dias. 
-        4. Não nos responsabilizamos por perda de dados; o backup é de responsabilidade do cliente.
+        <strong style="color: #111827; display: block; margin-bottom: 5px;">TERMOS E CONDIÇÕES DE SERVIÇO:</strong> 
+        1. O prazo para diagnóstico e orçamento preliminar é de até 48 horas úteis após a entrada. 
+        2. Equipamentos não retirados em até 90 dias após a conclusão do serviço ou reprovação do orçamento serão considerados abandonados, podendo ser vendidos para custear despesas de armazenamento. 
+        3. A garantia legal é de 90 dias e cobre apenas os serviços executados e peças efetivamente substituídas. 
+        4. O backup dos dados é de inteira responsabilidade do cliente. Não nos responsabilizamos por perdas de informações ou softwares.
+        5. A retirada do equipamento só será permitida mediante apresentação desta Ordem de Serviço ou documento de identidade do titular.
       </div>
 
       <div class="signatures">
         <div class="signature-line">ASSINATURA DO CLIENTE</div>
-        <div class="signature-line">ASSINATURA DO RESPONSÁVEL</div>
+        <div class="signature-line">CARIMBO / ASSINATURA DA EMPRESA</div>
       </div>
 
       <div class="footer">
-        Documento gerado pelo sistema BelemTI em ${new Date().toLocaleString('pt-BR')}
+        Gerado profissionalmente por <span style="font-weight: 900; color: #3b82f6;">ESTOQUE FÁCIL</span> • ${new Date().toLocaleString('pt-BR')}
       </div>
     </body>
     </html>
@@ -361,38 +367,44 @@ export const printServiceReceipt = (
     <head>
       <title>Comprovante de Serviço e Garantia Nº ${os.id}</title>
       <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
-        body { font-family: 'Inter', Arial, sans-serif; color: #000; margin: 0; padding: 20px; line-height: 1.4; font-size: 11px; }
-        .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
-        .company-info { display: flex; align-items: center; gap: 15px; }
-        .company-logo-header { max-width: 60px; max-height: 60px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); mix-blend-mode: multiply; }
-        .company-info h1 { margin: 0; color: #000; font-size: 20px; font-weight: bold; }
-        .company-info p { margin: 2px 0; font-size: 10px; color: #333; }
-        .doc-badge { text-align: right; border: 1px solid #000; padding: 10px; border-radius: 4px; }
-        .doc-badge h2 { margin: 0; font-size: 12px; font-weight: bold; }
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap');
+        body { font-family: 'Outfit', Arial, sans-serif; color: #1f2937; margin: 0; padding: 40px; line-height: 1.5; font-size: 12px; }
+        .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #10b981; padding-bottom: 20px; margin-bottom: 25px; }
+        .company-info { display: flex; align-items: center; gap: 20px; }
+        .company-logo-header { max-width: 80px; max-height: 80px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); mix-blend-mode: ${logoBlend}; }
+        .company-info h1 { margin: 0; color: #111827; font-size: 24px; font-weight: 900; letter-spacing: -0.025em; }
+        .company-info p { margin: 4px 0; font-size: 11px; color: #6b7280; font-weight: 500; }
+        .doc-badge { text-align: right; border: 2px solid #10b981; padding: 15px 25px; border-radius: 20px; background: #f0fdf4; }
+        .doc-badge h2 { margin: 0; font-size: 10px; font-weight: 900; color: #10b981; text-transform: uppercase; letter-spacing: 0.1em; }
+        .doc-badge p { margin: 5px 0 0; font-size: 18px; font-weight: 900; color: #111827; }
         
-        .section { margin-bottom: 15px; }
-        .section-header { background: #f0f0f0; padding: 5px 10px; font-weight: bold; text-transform: uppercase; font-size: 10px; border-left: 4px solid #000; margin-bottom: 8px; }
+        .section { margin-bottom: 25px; background: #fff; border-radius: 16px; border: 1px solid #f3f4f6; overflow: hidden; }
+        .section-header { background: #f9fafb; padding: 12px 16px; font-weight: 900; text-transform: uppercase; font-size: 10px; color: #374151; border-bottom: 1px solid #f1f5f9; letter-spacing: 0.05em; display: flex; align-items: center; gap: 8px; }
+        .section-header::before { content: ""; display: block; width: 4px; height: 12px; background: #10b981; border-radius: 2px; }
         
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .info-row { margin-bottom: 4px; }
-        .info-label { font-weight: bold; width: 100px; display: inline-block; color: #666; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .info-row { margin-bottom: 8px; display: flex; align-items: baseline; gap: 8px; }
+        .info-label { font-weight: 700; font-size: 10px; color: #9ca3af; text-transform: uppercase; min-width: 90px; }
+        .info-value { font-weight: 600; color: #1f2937; }
         
-        table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
-        th { background: #f0f0f0; padding: 6px; text-align: left; font-size: 10px; text-transform: uppercase; color: #000; border: 1px solid #ddd; }
-        td { padding: 6px; border: 1px solid #ddd; font-size: 10px; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: 0; }
+        th { background: #f9fafb; padding: 14px; text-align: left; font-size: 10px; text-transform: uppercase; color: #6b7280; border-bottom: 1px solid #f1f5f9; font-weight: 900; }
+        td { padding: 14px; border-bottom: 1px solid #f1f5f9; font-size: 11px; color: #374151; font-weight: 500; }
+        tr:last-child td { border-bottom: none; }
         
-        .totals { text-align: right; margin-top: 10px; }
-        .total-value { font-size: 18px; font-weight: bold; border-top: 2px solid #000; display: inline-block; padding-top: 5px; margin-top: 5px; width: 200px; }
+        .totals { text-align: right; margin-top: 20px; padding: 20px; background: #f9fafb; border-top: 1px solid #f1f5f9; }
+        .total-value { font-size: 24px; font-weight: 900; color: #111827; margin-top: 5px; }
+        .total-label { font-size: 10px; color: #6b7280; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; }
         
-        .warranty { margin-top: 20px; border: 1px solid #000; padding: 10px; border-radius: 4px; }
-        .warranty h3 { margin: 0 0 10px 0; font-size: 11px; text-transform: uppercase; }
-        .warranty p { margin: 0; font-size: 9px; line-height: 1.5; white-space: pre-line; }
+        .warranty { margin-top: 30px; border: 1px solid #10b981; padding: 20px; border-radius: 16px; background: #f0fdf4/30; }
+        .warranty h3 { margin: 0 0 12px 0; font-size: 12px; font-weight: 900; text-transform: uppercase; color: #10b981; display: flex; align-items: center; gap: 8px; }
+        .warranty p { margin: 0; font-size: 10px; line-height: 1.6; white-space: pre-line; color: #374151; font-weight: 500; }
         
-        .signatures { display: flex; justify-content: space-between; margin-top: 40px; }
-        .signature-line { border-top: 1px solid #000; width: 250px; text-align: center; padding-top: 5px; font-size: 9px; font-weight: bold; }
+        .signatures { display: flex; justify-content: space-between; margin-top: 60px; padding: 0 20px; }
+        .signature-line { border-top: 2px solid #e5e7eb; width: 280px; text-align: center; padding-top: 10px; font-size: 10px; font-weight: 700; color: #4b5563; }
         
-        .footer { margin-top: 20px; text-align: center; font-size: 8px; color: #999; }
+        .footer { margin-top: 40px; text-align: center; font-size: 9px; color: #9ca3af; font-weight: 500; }
+        .service-perform { background: #f0f9ff; color: #0369a1; padding: 10px; border-radius: 8px; font-style: italic; margin-top: 10px; font-weight: 500; font-size: 10px; }
       </style>
     </head>
     <body onload="window.print()">
@@ -400,15 +412,15 @@ export const printServiceReceipt = (
         <div class="company-info">
           ${headerLogoHtml}
           <div>
-            <p style="margin: 0; font-size: 9px; text-transform: uppercase; color: #666; font-weight: bold; letter-spacing: 1px;">${label}</p>
+            <p style="margin: 0; font-size: 10px; text-transform: uppercase; color: #10b981; font-weight: 900; letter-spacing: 0.1em;">${label}</p>
             <h1>${distributor}</h1>
             <p>${description}</p>
           </div>
         </div>
         <div class="doc-badge">
-          <h2>COMPROVANTE DE SERVIÇO</h2>
-          <p style="font-size: 14px; font-weight: bold; margin: 5px 0 0;">OS Nº ${os.id}</p>
-          <p style="font-size: 9px; margin-top: 2px;">Data: ${date}</p>
+          <h2>COMPROVANTE DE ENTREGA</h2>
+          <p style="font-size: 20px; margin-top: 5px;">OS Nº ${os.id}</p>
+          <div style="font-size: 10px; margin-top: 8px; font-weight: 700; opacity: 0.9;">Data: ${date}</div>
         </div>
       </div>
 
@@ -416,22 +428,32 @@ export const printServiceReceipt = (
         <div class="section">
           <div class="section-header">Dados do Cliente</div>
           <div class="section-content">
-            <div class="info-row"><span class="info-label">Nome:</span> <strong>${os.customerName}</strong></div>
-            <div class="info-row"><span class="info-label">Telefone:</span> ${os.customerPhone || 'Não informado'}</div>
-            <div class="info-row"><span class="info-label">CPF/CNPJ:</span> ${os.customerCPF || 'Não informado'}</div>
+            <div class="info-row"><span class="info-label">Nome:</span> <span class="info-value">${os.customerName}</span></div>
+            <div class="info-row"><span class="info-label">Telefone:</span> <span class="info-value">${os.customerPhone || 'Não informado'}</span></div>
+            <div class="info-row"><span class="info-label">CPF/CNPJ:</span> <span class="info-value">${os.customerCPF || 'Não informado'}</span></div>
           </div>
         </div>
         <div class="section">
           <div class="section-header">Dados do Equipamento</div>
           <div class="section-content">
-            <div class="info-row"><span class="info-label">Equipamento:</span> <strong>${os.equipment}</strong></div>
-            <div class="info-row"><span class="info-label">Nº de Série:</span> ${os.serialNumber || 'Não informado'}</div>
+            <div class="info-row"><span class="info-label">Aparelho:</span> <span class="info-value" style="color: #10b981;">${os.equipment}</span></div>
+            <div class="info-row"><span class="info-label">Nº de Série:</span> <span class="info-value">${os.serialNumber || 'Não informado'}</span></div>
           </div>
         </div>
       </div>
 
       <div class="section">
-        <div class="section-header">Serviços e Peças</div>
+        <div class="section-header">Serviços Realizados</div>
+        <div class="section-content">
+          <div class="service-perform">
+            <strong>Resumo técnico:</strong><br/>
+            ${os.servicePerformed || 'Reparo técnico e manutenção preventiva efetuada conforme solicitado.'}
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header">Relação de Peças e Serviços</div>
         <table>
           <thead>
             <tr>
@@ -449,7 +471,7 @@ export const printServiceReceipt = (
         </table>
         
         <div class="totals">
-          <div style="font-size: 10px; color: #666; text-transform: uppercase; font-weight: bold;">Total Final</div>
+          <div class="total-label">Valor Total do Serviço</div>
           <div class="total-value">${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalValue)}</div>
         </div>
       </div>
@@ -465,7 +487,7 @@ export const printServiceReceipt = (
       </div>
 
       <div class="footer">
-        Documento gerado pelo sistema BelemTI em ${new Date().toLocaleString('pt-BR')}
+        Este documento confirma a entrega e o funcionamento do equipamento • <span style="font-weight: 900; color: #10b981;">ESTOQUE FÁCIL</span> • ${new Date().toLocaleString('pt-BR')}
       </div>
     </body>
     </html>
@@ -529,26 +551,28 @@ export const printSalesReport = (
     <head>
       <title>Relatório de Vendas</title>
       <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
-        body { font-family: 'Inter', Arial, sans-serif; color: #000; margin: 0; padding: 20px; line-height: 1.4; font-size: 11px; }
-        .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
-        .company-info { display: flex; align-items: center; gap: 15px; }
-        .company-logo-header { max-width: 60px; max-height: 60px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); mix-blend-mode: multiply; }
-        .company-info h1 { margin: 0; color: #000; font-size: 20px; font-weight: bold; }
-        .company-info p { margin: 2px 0; font-size: 10px; color: #333; }
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap');
+        body { font-family: 'Outfit', Arial, sans-serif; color: #1f2937; margin: 0; padding: 40px; line-height: 1.5; font-size: 11px; }
+        .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #6366f1; padding-bottom: 20px; margin-bottom: 25px; }
+        .company-info { display: flex; align-items: center; gap: 20px; }
+        .company-logo-header { max-width: 80px; max-height: 80px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); mix-blend-mode: ${logoBlend}; }
+        .company-info h1 { margin: 0; color: #111827; font-size: 24px; font-weight: 900; letter-spacing: -0.025em; }
+        .company-info p { margin: 4px 0; font-size: 11px; color: #6b7280; font-weight: 500; }
         .document-title { text-align: right; }
-        .document-title h2 { margin: 0; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
+        .document-title h2 { margin: 0; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; font-weight: 900; color: #111827; }
+        .document-title p { margin: 5px 0 0; color: #6b7280; font-weight: 600; font-size: 10px; }
         
-        table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
-        th { background: #f0f0f0; padding: 6px; text-align: left; font-size: 10px; text-transform: uppercase; color: #000; border: 1px solid #ddd; }
-        td { padding: 6px; border: 1px solid #ddd; font-size: 10px; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: 20px; border: 1px solid #f1f5f9; border-radius: 12px; overflow: hidden; }
+        th { background: #f9fafb; padding: 12px; text-align: left; font-size: 9px; text-transform: uppercase; color: #9ca3af; border-bottom: 1px solid #f1f5f9; font-weight: 900; }
+        td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 10px; color: #374151; font-weight: 500; }
+        tr:last-child td { border-bottom: none; }
         
-        .summary { display: flex; justify-content: flex-end; gap: 40px; margin-top: 20px; padding: 15px; background: #f9f9f9; border-radius: 4px; }
+        .summary { display: flex; justify-content: flex-end; gap: 40px; margin-top: 30px; padding: 25px; background: #f9fafb; border-radius: 20px; border: 1px solid #f1f5f9; }
         .summary-item { text-align: right; }
-        .summary-label { font-size: 10px; color: #666; text-transform: uppercase; font-weight: bold; }
-        .summary-value { font-size: 16px; font-weight: bold; color: #000; }
+        .summary-label { font-size: 9px; color: #9ca3af; text-transform: uppercase; font-weight: 900; letter-spacing: 0.05em; margin-bottom: 5px; }
+        .summary-value { font-size: 20px; font-weight: 900; color: #111827; }
         
-        .footer { margin-top: 30px; text-align: center; font-size: 9px; color: #666; border-top: 1px solid #eee; padding-top: 10px; }
+        .footer { margin-top: 50px; text-align: center; font-size: 9px; color: #9ca3af; border-top: 1px solid #f1f5f9; padding-top: 20px; font-weight: 500; }
         
         @media print {
           body { padding: 0; }
@@ -560,14 +584,14 @@ export const printSalesReport = (
         <div class="company-info">
           ${headerLogoHtml}
           <div>
-            <p style="margin: 0; font-size: 9px; text-transform: uppercase; color: #666; font-weight: bold; letter-spacing: 1px;">${label}</p>
+            <p style="margin: 0; font-size: 10px; text-transform: uppercase; color: #6366f1; font-weight: 900; letter-spacing: 0.1em;">${label}</p>
             <h1>${distributor}</h1>
             <p>${description}</p>
           </div>
         </div>
         <div class="document-title">
           <h2>Relatório de Vendas</h2>
-          <p>Data: ${date}</p>
+          <p>Período: ${date}</p>
         </div>
       </div>
 
@@ -575,12 +599,12 @@ export const printSalesReport = (
         <thead>
           <tr>
             <th>Data</th>
-            <th>Venda</th>
+            <th>ID Venda</th>
             <th>Cliente</th>
             <th>Vendedor</th>
-            <th>PGTO</th>
+            <th>Pagamento</th>
             <th style="text-align: center;">Status</th>
-            <th style="text-align: right;">Total</th>
+            <th style="text-align: right;">Total Líquido</th>
           </tr>
         </thead>
         <tbody>
@@ -590,17 +614,17 @@ export const printSalesReport = (
 
       <div class="summary">
         <div class="summary-item">
-          <div class="summary-label">Vendas Realizadas</div>
+          <div class="summary-label">Volume de Vendas</div>
           <div class="summary-value">${totalSalesCount}</div>
         </div>
         <div class="summary-item">
-          <div class="summary-label">Faturamento Total</div>
-          <div class="summary-value">${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalRevenue)}</div>
+          <div class="summary-label">Faturamento Líquido</div>
+          <div class="summary-value" style="color: #6366f1;">${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalRevenue)}</div>
         </div>
       </div>
 
       <div class="footer">
-        Documento gerado pelo sistema BelemTI em ${new Date().toLocaleString('pt-BR')}
+        Relatório gerado por <span style="font-weight: 900; color: #111827;">ESTOQUE FÁCIL</span> • ${new Date().toLocaleString('pt-BR')}
       </div>
 
       <script>
@@ -663,38 +687,41 @@ export const printSaleReceipt = (
     <head>
       <title>Comprovante de Venda Nº ${sale.id.toUpperCase()}</title>
       <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
-        body { font-family: 'Inter', Arial, sans-serif; color: #000; margin: 0; padding: 20px; line-height: 1.4; font-size: 11px; }
-        .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
-        .company-info { display: flex; align-items: center; gap: 15px; }
-        .company-logo-header { max-width: 60px; max-height: 60px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); mix-blend-mode: multiply; }
-        .company-info h1 { margin: 0; color: #000; font-size: 20px; font-weight: bold; }
-        .company-info p { margin: 2px 0; font-size: 10px; color: #333; }
-        .doc-badge { text-align: right; border: 1px solid #000; padding: 10px; border-radius: 4px; }
-        .doc-badge h2 { margin: 0; font-size: 12px; font-weight: bold; }
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap');
+        body { font-family: 'Outfit', Arial, sans-serif; color: #1f2937; margin: 0; padding: 40px; line-height: 1.5; font-size: 11px; }
+        .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #111827; padding-bottom: 20px; margin-bottom: 25px; }
+        .company-info { display: flex; align-items: center; gap: 20px; }
+        .company-logo-header { max-width: 80px; max-height: 80px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); mix-blend-mode: ${logoBlend}; }
+        .company-info h1 { margin: 0; color: #111827; font-size: 24px; font-weight: 900; letter-spacing: -0.025em; }
+        .company-info p { margin: 4px 0; font-size: 11px; color: #6b7280; font-weight: 500; }
+        .doc-badge { text-align: right; border: 2px solid #111827; padding: 15px 25px; border-radius: 20px; background: #f9fafb; }
+        .doc-badge h2 { margin: 0; font-size: 10px; font-weight: 900; color: #111827; text-transform: uppercase; letter-spacing: 0.1em; }
+        .doc-badge p { margin: 5px 0 0; font-size: 18px; font-weight: 900; color: #111827; }
         
-        .section { margin-bottom: 15px; }
-        .section-header { background: #f0f0f0; padding: 5px 10px; font-weight: bold; text-transform: uppercase; font-size: 10px; border-left: 4px solid #000; margin-bottom: 8px; }
+        .section { margin-bottom: 25px; background: #fff; border-radius: 16px; border: 1px solid #f3f4f6; overflow: hidden; }
+        .section-header { background: #f9fafb; padding: 12px 16px; font-weight: 900; text-transform: uppercase; font-size: 10px; color: #374151; border-bottom: 1px solid #f1f5f9; letter-spacing: 0.05em; display: flex; align-items: center; gap: 8px; }
         
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .info-row { margin-bottom: 4px; }
-        .info-label { font-weight: bold; width: 100px; display: inline-block; color: #666; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .info-row { margin-bottom: 8px; display: flex; align-items: baseline; gap: 8px; }
+        .info-label { font-weight: 700; font-size: 10px; color: #9ca3af; text-transform: uppercase; min-width: 90px; }
+        .info-value { font-weight: 600; color: #1f2937; }
         
-        table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
-        th { background: #f0f0f0; padding: 6px; text-align: left; font-size: 10px; text-transform: uppercase; color: #000; border: 1px solid #ddd; }
-        td { padding: 6px; border: 1px solid #ddd; font-size: 10px; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: 0; }
+        th { background: #f9fafb; padding: 14px; text-align: left; font-size: 10px; text-transform: uppercase; color: #6b7280; border-bottom: 1px solid #f1f5f9; font-weight: 900; }
+        td { padding: 14px; border-bottom: 1px solid #f1f5f9; font-size: 11px; color: #374151; font-weight: 500; }
+        tr:last-child td { border-bottom: none; }
         
-        .totals { text-align: right; margin-top: 10px; }
-        .total-value { font-size: 18px; font-weight: bold; border-top: 2px solid #000; display: inline-block; padding-top: 5px; margin-top: 5px; width: 200px; }
+        .totals { text-align: right; margin-top: 10px; padding: 20px; border-top: 1px solid #f1f5f9; background: #fcfcfc; }
+        .total-value { font-size: 24px; font-weight: 900; color: #111827; margin-top: 5px; }
         
-        .warranty { margin-top: 20px; border: 1px solid #000; padding: 10px; border-radius: 4px; }
-        .warranty h3 { margin: 0 0 10px 0; font-size: 11px; text-transform: uppercase; }
-        .warranty p { margin: 0; font-size: 9px; line-height: 1.5; white-space: pre-line; }
+        .warranty { margin-top: 30px; border: 1px solid #e5e7eb; padding: 20px; border-radius: 16px; background: #fafafa; }
+        .warranty h3 { margin: 0 0 12px 0; font-size: 12px; font-weight: 900; text-transform: uppercase; color: #111827; }
+        .warranty p { margin: 0; font-size: 10px; line-height: 1.6; white-space: pre-line; color: #4b5563; font-weight: 500; }
         
-        .signatures { display: flex; justify-content: space-between; margin-top: 40px; }
-        .signature-line { border-top: 1px solid #000; width: 250px; text-align: center; padding-top: 5px; font-size: 9px; font-weight: bold; }
+        .signatures { display: flex; justify-content: space-between; margin-top: 60px; padding: 0 20px; }
+        .signature-line { border-top: 2px solid #e5e7eb; width: 280px; text-align: center; padding-top: 10px; font-size: 10px; font-weight: 700; color: #4b5563; }
         
-        .footer { margin-top: 20px; text-align: center; font-size: 8px; color: #999; }
+        .footer { margin-top: 40px; text-align: center; font-size: 9px; color: #9ca3af; font-weight: 500; }
       </style>
     </head>
     <body onload="window.print()">
@@ -702,15 +729,15 @@ export const printSaleReceipt = (
         <div class="company-info">
           ${headerLogoHtml}
           <div>
-            <p style="margin: 0; font-size: 9px; text-transform: uppercase; color: #666; font-weight: bold; letter-spacing: 1px;">${label}</p>
+            <p style="margin: 0; font-size: 10px; text-transform: uppercase; color: #111827; font-weight: 900; letter-spacing: 0.1em;">${label}</p>
             <h1>${distributor}</h1>
             <p>${description}</p>
           </div>
         </div>
         <div class="doc-badge">
           <h2>COMPROVANTE DE VENDA</h2>
-          <p style="font-size: 14px; font-weight: bold; margin: 5px 0 0;">ID: ${sale.id.toUpperCase()}</p>
-          <p style="font-size: 9px; margin-top: 2px;">Data: ${date}</p>
+          <p style="font-size: 20px; margin-top: 5px;">ID: ${sale.id.toUpperCase()}</p>
+          <div style="font-size: 10px; margin-top: 8px; font-weight: 700; opacity: 0.9;">Data: ${date}</div>
         </div>
       </div>
 
@@ -718,22 +745,22 @@ export const printSaleReceipt = (
         <div class="section">
           <div class="section-header">Dados do Cliente</div>
           <div class="section-content">
-            <div class="info-row"><span class="info-label">Nome:</span> <strong>${sale.customerName || 'Consumidor'}</strong></div>
-            <div class="info-row"><span class="info-label">Telefone:</span> ${sale.customerPhone || 'Não informado'}</div>
-            <div class="info-row"><span class="info-label">CPF/CNPJ:</span> ${sale.customerCPF || 'Não informado'}</div>
+            <div class="info-row"><span class="info-label">Nome:</span> <span class="info-value">${sale.customerName || 'Consumidor Final'}</span></div>
+            <div class="info-row"><span class="info-label">Telefone:</span> <span class="info-value">${sale.customerPhone || 'Não informado'}</span></div>
+            <div class="info-row"><span class="info-label">CPF/CNPJ:</span> <span class="info-value">${sale.customerCPF || 'Não informado'}</span></div>
           </div>
         </div>
         <div class="section">
           <div class="section-header">Informações da Venda</div>
           <div class="section-content">
-            <div class="info-row"><span class="info-label">Vendedor:</span> ${sale.seller}</div>
-            <div class="info-row"><span class="info-label">Pagamento:</span> ${sale.paymentMethod}</div>
+            <div class="info-row"><span class="info-label">Vendedor:</span> <span class="info-value">${sale.seller}</span></div>
+            <div class="info-row"><span class="info-label">Pagamento:</span> <span class="info-value" style="color: #6366f1;">${sale.paymentMethod}</span></div>
           </div>
         </div>
       </div>
 
       <div class="section">
-        <div class="section-header">Produtos e Serviços</div>
+        <div class="section-header">Produtos e Itens Comprados</div>
         <table>
           <thead>
             <tr>
@@ -750,25 +777,29 @@ export const printSaleReceipt = (
         </table>
         
         <div class="totals">
-          <div style="font-size: 10px; color: #666; text-transform: uppercase; font-weight: bold;">Subtotal: ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(sale.totalValue)}</div>
-          <div style="font-size: 10px; color: #f87171; text-transform: uppercase; font-weight: bold;">Desconto: ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(sale.discount)}</div>
-          <div style="font-size: 10px; color: #666; text-transform: uppercase; font-weight: bold;">Total Final</div>
+          <div style="font-size: 10px; color: #9ca3af; text-transform: uppercase; font-weight: 900; margin-bottom: 5px;">
+            Subtotal: ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(sale.totalValue)}
+          </div>
+          <div style="font-size: 10px; color: #ef4444; text-transform: uppercase; font-weight: 900; margin-bottom: 5px;">
+            Desconto: -${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(sale.discount)}
+          </div>
+          <div style="font-size: 11px; color: #111827; text-transform: uppercase; font-weight: 900;">Total da Venda</div>
           <div class="total-value">${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(sale.finalValue)}</div>
         </div>
       </div>
 
       <div class="warranty">
-        <h3>Termo de Garantia</h3>
+        <h3>Termo de Garantia e Condições</h3>
         <p>${warrantyTerm}</p>
       </div>
 
       <div class="signatures">
         <div class="signature-line">DATA E ASSINATURA DO CLIENTE</div>
-        <div class="signature-line">ASSINATURA DO RESPONSÁVEL</div>
+        <div class="signature-line">RESPONSÁVEL PELA VENDA</div>
       </div>
 
       <div class="footer">
-        Documento gerado pelo sistema ${distributor} em ${new Date().toLocaleString('pt-BR')}
+        Obrigado pela preferência! • <span style="font-weight: 900; color: #111827;">${distributor}</span> • ${new Date().toLocaleString('pt-BR')}
       </div>
     </body>
     </html>

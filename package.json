@@ -12,6 +12,9 @@
     "lint": "tsc --noEmit",
     "test": "vitest run"
   },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
   "dependencies": {
     "@google/genai": "^1.29.0",
     "@prisma/adapter-pg": "^7.5.0",
