@@ -4,11 +4,11 @@ import { useApp } from '../../context/AppContext';
 import { cn } from '../../lib/utils';
 
 const Header: React.FC = () => {
-  const { 
-    isDarkMode, 
-    setIsDarkMode, 
-    searchQuery, 
-    setSearchQuery, 
+  const {
+    isDarkMode,
+    setIsDarkMode,
+    searchQuery,
+    setSearchQuery,
     currentUser,
     activeTab,
     setIsCalculatorOpen,
@@ -26,15 +26,15 @@ const Header: React.FC = () => {
       case 'logs': return 'Histórico do Sistema';
       case 'users': return 'Gestão de Acesso';
       case 'settings': return 'Configurações Globais';
-      default: return 'Estoque Fácil';
+      default: return 'BELEMTI';
     }
   };
 
   return (
     <header className={cn(
       "h-16 px-8 flex items-center justify-between sticky top-0 z-30",
-      isDarkMode 
-        ? "bg-[#020617] border-b border-slate-800/60 shadow-lg shadow-black/20" 
+      isDarkMode
+        ? "bg-[#020617] border-b border-slate-800/60 shadow-lg shadow-black/20"
         : "bg-white border-b border-slate-100 shadow-sm"
     )}>
       <div className="flex items-center gap-1.5 flex-1">
@@ -44,7 +44,7 @@ const Header: React.FC = () => {
         )}>
           {getPageTitle()}
         </h2>
-        
+
         {/* Universal Search Bar */}
         {['inventory', 'sales', 'customers', 'os', 'logs'].includes(activeTab) && (
           <div className="relative w-full max-w-xs group hidden md:block">
@@ -56,8 +56,8 @@ const Header: React.FC = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
               className={cn(
                 "w-full pl-10 pr-4 py-2 rounded-lg border outline-none transition-all duration-200 text-xs",
-                isDarkMode 
-                  ? "bg-slate-900 border-slate-800 text-white focus:border-blue-600 placeholder:text-slate-600" 
+                isDarkMode
+                  ? "bg-slate-900 border-slate-800 text-white focus:border-blue-600 placeholder:text-slate-600"
                   : "bg-slate-50 border-slate-200 text-slate-900 focus:border-blue-600"
               )}
             />
@@ -67,7 +67,7 @@ const Header: React.FC = () => {
 
       <div className="flex items-center gap-3 md:gap-6">
         <div className="flex items-center gap-2 p-1 rounded-lg md:p-1.5 md:rounded-xl bg-slate-500/5 border border-slate-500/10">
-          <button 
+          <button
             onClick={() => setIsCalculatorOpen(prev => !prev)}
             className={cn(
               "p-2 md:p-2.5 rounded-lg transition-all duration-200",
@@ -77,7 +77,7 @@ const Header: React.FC = () => {
           >
             <Calculator size={16} />
           </button>
-          <button 
+          <button
             onClick={() => setIsNotificationsOpen(prev => !prev)}
             className={cn(
               "p-2 md:p-2.5 rounded-lg transition-all duration-200 relative",
@@ -104,7 +104,7 @@ const Header: React.FC = () => {
               {currentUser?.role || 'User'}
             </span>
           </div>
-          
+
           <div className={cn(
             "w-8 h-8 md:w-9 md:h-9 rounded-lg overflow-hidden flex items-center justify-center border transition-all duration-300 group cursor-pointer",
             isDarkMode ? "bg-slate-900 border-slate-800" : "bg-slate-50 border-slate-200"

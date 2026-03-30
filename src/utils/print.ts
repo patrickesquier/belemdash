@@ -2,13 +2,13 @@ import { Product, Sale, ServiceOrder } from '../types';
 import belemLogo from '../assets/belem-ti-logo-black.png';
 
 export const printInventory = (
-  products: Product[], 
-  distributor: string, 
-  description: string, 
-  label: string, 
-  logo: string | null, 
-  iconName: string, 
-  color: string, 
+  products: Product[],
+  distributor: string,
+  description: string,
+  label: string,
+  logo: string | null,
+  iconName: string,
+  color: string,
   logoBlend: string = 'normal'
 ) => {
   const printWindow = window.open('', '_blank');
@@ -124,7 +124,7 @@ export const printInventory = (
       </div>
 
       <div class="footer">
-        Gerado por <span style="font-weight: 900; color: #111827;">ESTOQUE FÁCIL</span> • ${new Date().toLocaleString('pt-BR')} • Página 1 de 1
+        Gerado por <span style="font-weight: 900; color: #111827;">BELEMTI</span> • ${new Date().toLocaleString('pt-BR')} • Página 1 de 1
       </div>
 
       <script>
@@ -139,13 +139,13 @@ export const printInventory = (
 };
 
 export const printServiceOrder = (
-  os: ServiceOrder, 
-  distributor: string, 
-  description: string, 
-  label: string, 
-  logo: string | null, 
-  iconName: string, 
-  color: string, 
+  os: ServiceOrder,
+  distributor: string,
+  description: string,
+  label: string,
+  logo: string | null,
+  iconName: string,
+  color: string,
   logoBlend: string = 'normal'
 ) => {
   const printWindow = window.open('', '_blank');
@@ -296,7 +296,7 @@ export const printServiceOrder = (
       </div>
 
       <div class="footer">
-        Gerado profissionalmente por <span style="font-weight: 900; color: #3b82f6;">ESTOQUE FÁCIL</span> • ${new Date().toLocaleString('pt-BR')}
+        Gerado profissionalmente por <span style="font-weight: 900; color: #3b82f6;">BELEMTI</span> • ${new Date().toLocaleString('pt-BR')}
       </div>
     </body>
     </html>
@@ -307,14 +307,14 @@ export const printServiceOrder = (
 };
 
 export const printServiceReceipt = (
-  os: ServiceOrder, 
-  distributor: string, 
-  description: string, 
-  label: string, 
-  logo: string | null, 
-  iconName: string, 
-  color: string, 
-  warrantyTerm: string, 
+  os: ServiceOrder,
+  distributor: string,
+  description: string,
+  label: string,
+  logo: string | null,
+  iconName: string,
+  color: string,
+  warrantyTerm: string,
   logoBlend: string = 'normal'
 ) => {
   const printWindow = window.open('', '_blank');
@@ -487,7 +487,7 @@ export const printServiceReceipt = (
       </div>
 
       <div class="footer">
-        Este documento confirma a entrega e o funcionamento do equipamento • <span style="font-weight: 900; color: #10b981;">ESTOQUE FÁCIL</span> • ${new Date().toLocaleString('pt-BR')}
+        Este documento confirma a entrega e o funcionamento do equipamento • <span style="font-weight: 900; color: #10b981;">BELEMTI</span> • ${new Date().toLocaleString('pt-BR')}
       </div>
     </body>
     </html>
@@ -498,13 +498,13 @@ export const printServiceReceipt = (
 };
 
 export const printSalesReport = (
-  sales: Sale[], 
-  distributor: string, 
-  description: string, 
-  label: string, 
-  logo: string | null, 
-  iconName: string, 
-  color: string, 
+  sales: Sale[],
+  distributor: string,
+  description: string,
+  label: string,
+  logo: string | null,
+  iconName: string,
+  color: string,
   logoBlend: string = 'normal'
 ) => {
   const printWindow = window.open('', '_blank');
@@ -624,7 +624,7 @@ export const printSalesReport = (
       </div>
 
       <div class="footer">
-        Relatório gerado por <span style="font-weight: 900; color: #111827;">ESTOQUE FÁCIL</span> • ${new Date().toLocaleString('pt-BR')}
+        Relatório gerado por <span style="font-weight: 900; color: #111827;">BELEMTI</span> • ${new Date().toLocaleString('pt-BR')}
       </div>
 
       <script>
