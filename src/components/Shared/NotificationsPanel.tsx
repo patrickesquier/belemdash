@@ -14,7 +14,7 @@ const NotificationsPanel: React.FC = () => {
       case 'update_sale':
       case 'delete_sale': return <ShoppingCart size={14} className="text-blue-500" />;
       case 'login':
-      case 'logout': return <User size={14} className="text-zinc-500" />;
+      case 'logout': return <User size={14} className="text-slate-500" />;
       case 'create_product':
       case 'update_product':
       case 'delete_product': return <Package size={14} className="text-emerald-500" />;
@@ -44,16 +44,16 @@ const NotificationsPanel: React.FC = () => {
         exit={{ x: 400, opacity: 0 }}
         className={cn(
           "fixed right-0 top-0 bottom-0 w-80 z-[60] border-l shadow-2xl flex flex-col",
-          isDarkMode ? "bg-zinc-950 border-zinc-900" : "bg-white border-zinc-100"
+          isDarkMode ? "bg-slate-950 border-slate-900" : "bg-white border-slate-100"
         )}
       >
-        <div className="p-6 border-b border-zinc-500/10 flex items-center justify-between">
-          <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-500">Notificações</h3>
+        <div className="p-6 border-b border-slate-500/10 flex items-center justify-between">
+          <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500">Notificações</h3>
           <button 
             onClick={() => setIsNotificationsOpen(false)}
-            className="p-1 hover:bg-zinc-500/10 rounded-lg transition-colors"
+            className="p-1 hover:bg-slate-500/10 rounded-lg transition-colors"
           >
-            <X size={16} className="text-zinc-500" />
+            <X size={16} className="text-slate-500" />
           </button>
         </div>
 
@@ -69,18 +69,18 @@ const NotificationsPanel: React.FC = () => {
                 key={log.id} 
                 className={cn(
                   "p-4 rounded-xl border transition-all duration-300",
-                  isDarkMode ? "bg-zinc-900 border-zinc-900 hover:border-zinc-800" : "bg-zinc-50 border-zinc-100 hover:border-zinc-200"
+                  isDarkMode ? "bg-slate-900 border-slate-900 hover:border-slate-800" : "bg-slate-50 border-slate-100 hover:border-slate-200"
                 )}
               >
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="p-1.5 rounded-lg bg-zinc-500/10">
+                  <div className="p-1.5 rounded-lg bg-slate-500/10">
                     {getLogIcon(log.action)}
                   </div>
-                  <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest leading-none">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none">
                     {new Date(log.timestamp).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                   </span>
                 </div>
-                <p className="text-xs font-bold text-zinc-400 group-hover:text-zinc-200 transition-colors">
+                <p className="text-xs font-bold text-slate-400 group-hover:text-slate-200 transition-colors">
                   {log.details}
                 </p>
               </div>
@@ -89,13 +89,13 @@ const NotificationsPanel: React.FC = () => {
         </div>
 
         {recentLogs.length > 0 && (
-          <div className="p-6 border-t border-zinc-500/10">
+          <div className="p-6 border-t border-slate-500/10">
             <button 
               onClick={() => {
                 // Should navigate to logs tab
                 setIsNotificationsOpen(false);
               }}
-              className="w-full py-3 rounded-lg border border-zinc-500/10 text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:bg-zinc-500/5 transition-all flex items-center justify-center gap-2"
+              className="w-full py-3 rounded-lg border border-slate-500/10 text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:bg-slate-500/5 transition-all flex items-center justify-center gap-2"
             >
               Ver Tudo <ArrowRight size={12} />
             </button>

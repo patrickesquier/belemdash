@@ -63,6 +63,12 @@ Acesse: `http://localhost:3000`
 
 ---
 
+## Criar Backup
+
+```bash
+docker exec -t belemdash-db-1 pg_dump -U postgres estoque_facil > backup_belemdash_$(date +%Y%m%d).sql
+```
+
 ## 🧪 Testes e Qualidade
 
 Mantenha o código seguro com a suíte de testes automatizados:

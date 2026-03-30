@@ -398,6 +398,7 @@ protectedRouter.delete("/service-orders/:id", async (req, res) => {
 // Users
 protectedRouter.get("/users", checkRole(['admin', 'supervisor']), async (req, res) => {
   const users = await prisma.user.findMany({
+    select: { id: true, username: true, name: true, role: true },
     orderBy: { name: 'asc' }
   });
   res.json(users);
@@ -405,20 +406,25 @@ protectedRouter.get("/users", checkRole(['admin', 'supervisor']), async (req, re
 
 protectedRouter.post("/users", checkRole(['admin', 'supervisor']), async (req, res) => {
   const u = req.body;
-  const isHashed = /^\$2[ayb]\$.{56}$/.test(u.password);
-  const hashedPassword = isHashed ? u.password : await bcrypt.hash(u.password, SALT_ROUNDS);
+  
+  const updateData: any = {
+    username: u.username,
+    role: u.role,
+    name: u.name,
+  };
+
+  if (u.password && String(u.password).trim() !== '') {
+    const isHashed = /^\$2[ayb]\$.{56}$/.test(u.password);
+    updateData.password = isHashed ? u.password : await bcrypt.hash(u.password, SALT_ROUNDS);
+  }
+
   await prisma.user.upsert({
-    where: { id: u.id },
-    update: {
-      username: u.username,
-      password: hashedPassword,
-      role: u.role,
-      name: u.name,
-    },
+    where: { id: u.id || 'new_user_placeholder_to_force_create' },
+    update: updateData,
     create: {
-      id: u.id,
+      id: u.id || undefined,
       username: u.username,
-      password: hashedPassword,
+      password: updateData.password || await bcrypt.hash('123456', SALT_ROUNDS),
       role: u.role,
       name: u.name,
     },

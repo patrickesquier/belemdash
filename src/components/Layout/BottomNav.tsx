@@ -30,6 +30,7 @@ const BottomNav: React.FC = () => {
     ...(enableServices ? [{ id: 'os', label: 'Ordens de Serviço', icon: Wrench }] : []),
     ...(currentUser?.role === 'admin' ? [{ id: 'logs', label: 'Audit / Logs', icon: FileText }] : []),
     ...(currentUser?.role === 'admin' || currentUser?.role === 'supervisor' ? [{ id: 'users', label: 'Usuários', icon: User }] : []),
+    ...(currentUser?.role === 'admin' || currentUser?.role === 'supervisor' ? [{ id: 'sellers', label: 'Vendedores', icon: Users }] : []),
     ...(currentUser?.role === 'admin' ? [{ id: 'settings', label: 'Configurações', icon: Settings }] : []),
   ];
 
@@ -37,7 +38,7 @@ const BottomNav: React.FC = () => {
     <>
       <nav className={cn(
         "fixed bottom-0 left-0 right-0 z-50 md:hidden border-t safe-area-bottom pb-2",
-        isDarkMode ? "bg-zinc-950/80 backdrop-blur-xl border-zinc-900" : "bg-white/80 backdrop-blur-xl border-zinc-100"
+        isDarkMode ? "bg-[#020617]/90 backdrop-blur-xl border-slate-800" : "bg-white/80 backdrop-blur-xl border-slate-100"
       )}>
         <div className="flex items-center justify-around h-16 px-4">
           {mainItems.map((item) => {
@@ -54,14 +55,14 @@ const BottomNav: React.FC = () => {
                 className={cn(
                   "flex flex-col items-center justify-center gap-1 transition-all relative px-3",
                   isActive 
-                    ? "text-blue-500" 
-                    : (isDarkMode ? "text-zinc-500" : "text-zinc-400")
+                    ? "text-blue-600" 
+                    : (isDarkMode ? "text-slate-500" : "text-slate-400")
                 )}
               >
                 {isActive && (
                   <motion.div 
                     layoutId="bottom-nav-active"
-                    className="absolute -top-3 w-1.5 h-1.5 rounded-full bg-blue-500"
+                    className="absolute -top-3 w-1.5 h-1.5 rounded-full bg-blue-600"
                   />
                 )}
                 <Icon size={20} className={cn("transition-transform duration-300", isActive && "scale-110")} />
@@ -75,8 +76,8 @@ const BottomNav: React.FC = () => {
             className={cn(
               "flex flex-col items-center justify-center gap-1 transition-all px-3",
               isMenuOpen || moreItems.some(i => i.id === activeTab)
-                ? "text-blue-500" 
-                : (isDarkMode ? "text-zinc-500" : "text-zinc-400")
+                ? "text-blue-600" 
+                : (isDarkMode ? "text-slate-500" : "text-slate-400")
             )}
           >
              <Menu size={20} className={cn("transition-transform duration-300", isMenuOpen && "rotate-90")} />
@@ -93,7 +94,7 @@ const BottomNav: React.FC = () => {
             exit={{ opacity: 0, y: 100 }}
             className={cn(
               "fixed bottom-20 left-4 right-4 z-50 rounded-2xl border shadow-2xl p-4 md:hidden overflow-hidden",
-              isDarkMode ? "bg-zinc-900/90 backdrop-blur-2xl border-zinc-800" : "bg-white/90 backdrop-blur-2xl border-zinc-200"
+              isDarkMode ? "bg-slate-900/90 backdrop-blur-2xl border-slate-800" : "bg-white/90 backdrop-blur-2xl border-slate-200"
             )}
           >
             <div className="grid grid-cols-2 gap-3">
@@ -110,8 +111,8 @@ const BottomNav: React.FC = () => {
                     className={cn(
                       "flex items-center gap-3 p-3 rounded-xl transition-all",
                       isActive 
-                        ? "bg-blue-500 text-white" 
-                        : (isDarkMode ? "bg-zinc-800/50 text-zinc-400" : "bg-zinc-100 text-zinc-600")
+                        ? "bg-blue-600 text-white" 
+                        : (isDarkMode ? "bg-slate-800/50 text-slate-400" : "bg-slate-100 text-slate-600")
                     )}
                   >
                     <Icon size={18} />

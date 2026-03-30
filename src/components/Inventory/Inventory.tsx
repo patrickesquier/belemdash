@@ -28,7 +28,7 @@ const Inventory: React.FC = () => {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
         <div className="relative w-full md:w-80 group">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={14} />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={14} />
           <input
             type="text"
             placeholder="Pesquisar produtos (Ctrl+K)..."
@@ -37,8 +37,8 @@ const Inventory: React.FC = () => {
             className={cn(
               "w-full pl-10 pr-4 py-2 rounded-lg border outline-none font-medium text-xs",
               isDarkMode 
-                ? "bg-zinc-900 border-zinc-800 text-white" 
-                : "bg-zinc-50 border-zinc-200"
+                ? "bg-slate-900 border-slate-800 text-white" 
+                : "bg-slate-50 border-slate-200"
             )}
           />
         </div>
@@ -48,7 +48,7 @@ const Inventory: React.FC = () => {
             onClick={() => printInventory(products, distributorName, distributorDescription, distributorLabel, distributorLogo, distributorIcon, distributorColor, distributorLogoBlend)}
             className={cn(
               "flex-1 md:flex-none px-4 py-2 rounded-lg border flex items-center justify-center gap-2 font-bold text-xs",
-              isDarkMode ? "bg-zinc-900 border-zinc-800" : "bg-white border-zinc-200 shadow-sm"
+              isDarkMode ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200 shadow-sm"
             )}
           >
             <FileDown size={18} />

@@ -56,12 +56,12 @@ const ProductModal: React.FC = () => {
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           className={cn(
             "relative w-full max-w-lg border rounded-xl shadow-xl overflow-hidden",
-            isDarkMode ? "bg-zinc-900 border-zinc-800" : "bg-white border-zinc-200"
+            isDarkMode ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200"
           )}
         >
           <div className={cn(
             "p-6 border-b flex items-center justify-between",
-            isDarkMode ? "border-zinc-800" : "border-zinc-200"
+            isDarkMode ? "border-slate-800" : "border-slate-200"
           )}>
             <h2 className="text-xl font-bold">{editingProduct ? 'Editar Produto' : 'Adicionar Produto'}</h2>
             <button 
@@ -69,7 +69,7 @@ const ProductModal: React.FC = () => {
                 setIsModalOpen(false);
                 setEditingProduct(null);
               }} 
-              className="text-zinc-500 hover:text-zinc-600 transition-colors"
+              className="text-slate-500 hover:text-slate-600 transition-colors"
             >
               <X size={18} />
             </button>
@@ -78,42 +78,42 @@ const ProductModal: React.FC = () => {
           <form onSubmit={handleSubmit} className="p-6 space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="col-span-2 space-y-1.5">
-                <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest leading-none">Nome do Produto</label>
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none">Nome do Produto</label>
                 <input
                   name="name"
                   required
                   defaultValue={editingProduct?.name}
                   className={cn(
                     "w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all text-xs",
-                    isDarkMode ? "bg-zinc-800 border-zinc-700 text-white" : "bg-zinc-50 border-zinc-200 text-zinc-900"
+                    isDarkMode ? "bg-slate-800 border-slate-700 text-white" : "bg-slate-50 border-slate-200 text-slate-900"
                   )}
                   placeholder="Ex: Teclado Mecânico RGB"
                 />
               </div>
               
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest leading-none">SKU / Código</label>
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none">SKU / Código</label>
                 <input
                   name="sku"
                   required
                   defaultValue={editingProduct?.sku}
                   className={cn(
                     "w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all text-xs",
-                    isDarkMode ? "bg-zinc-800 border-zinc-700 text-white" : "bg-zinc-50 border-zinc-200 text-zinc-900"
+                    isDarkMode ? "bg-slate-800 border-slate-700 text-white" : "bg-slate-50 border-slate-200 text-slate-900"
                   )}
                   placeholder="TEC-001"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest leading-none">Categoria</label>
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none">Categoria</label>
                 <select
                   name="category"
                   required
                   defaultValue={editingProduct?.category || CATEGORIES[0]}
                   className={cn(
                     "w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all text-xs",
-                    isDarkMode ? "bg-zinc-800 border-zinc-700 text-white" : "bg-zinc-50 border-zinc-200 text-zinc-900"
+                    isDarkMode ? "bg-slate-800 border-slate-700 text-white" : "bg-slate-50 border-slate-200 text-slate-900"
                   )}
                 >
                   {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
@@ -121,7 +121,7 @@ const ProductModal: React.FC = () => {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest leading-none">Quantidade</label>
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none">Quantidade</label>
                 <input
                   name="quantity"
                   type="number"
@@ -130,13 +130,13 @@ const ProductModal: React.FC = () => {
                   defaultValue={editingProduct?.quantity || 0}
                   className={cn(
                     "w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all text-xs",
-                    isDarkMode ? "bg-zinc-800 border-zinc-700 text-white" : "bg-zinc-50 border-zinc-200 text-zinc-900"
+                    isDarkMode ? "bg-slate-800 border-slate-700 text-white" : "bg-slate-50 border-slate-200 text-slate-900"
                   )}
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest leading-none">Preço Unitário (R$)</label>
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none">Preço Unitário (R$)</label>
                 <input
                   name="price"
                   type="number"
@@ -146,13 +146,13 @@ const ProductModal: React.FC = () => {
                   defaultValue={editingProduct?.price || 0}
                   className={cn(
                     "w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all text-xs",
-                    isDarkMode ? "bg-zinc-800 border-zinc-700 text-white" : "bg-zinc-50 border-zinc-200 text-zinc-900"
+                    isDarkMode ? "bg-slate-800 border-slate-700 text-white" : "bg-slate-50 border-slate-200 text-slate-900"
                   )}
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest leading-none">Preço de Custo (R$)</label>
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none">Preço de Custo (R$)</label>
                 <input
                   name="costPrice"
                   type="number"
@@ -162,7 +162,7 @@ const ProductModal: React.FC = () => {
                   defaultValue={editingProduct?.costPrice || 0}
                   className={cn(
                     "w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all text-xs",
-                    isDarkMode ? "bg-zinc-800 border-zinc-700 text-white" : "bg-zinc-50 border-zinc-200 text-zinc-900"
+                    isDarkMode ? "bg-slate-800 border-slate-700 text-white" : "bg-slate-50 border-slate-200 text-slate-900"
                   )}
                 />
               </div>
@@ -170,7 +170,7 @@ const ProductModal: React.FC = () => {
               {enableServices && (
                 <div className={cn(
                   "col-span-2 flex items-center gap-3 p-2.5 border rounded-lg",
-                  isDarkMode ? "bg-zinc-800/30 border-zinc-700" : "bg-zinc-50 border-zinc-100"
+                  isDarkMode ? "bg-slate-800/30 border-slate-700" : "bg-slate-50 border-slate-100"
                 )}>
                   <input
                     type="checkbox"
@@ -179,19 +179,19 @@ const ProductModal: React.FC = () => {
                     defaultChecked={editingProduct?.isService}
                     className="w-3.5 h-3.5 accent-blue-600"
                   />
-                  <label htmlFor="isService" className="text-xs font-bold text-zinc-500 uppercase tracking-widest cursor-pointer">Serviço (Mão de Obra)</label>
+                  <label htmlFor="isService" className="text-xs font-bold text-slate-500 uppercase tracking-widest cursor-pointer">Serviço (Mão de Obra)</label>
                 </div>
               )}
 
               <div className="col-span-2 space-y-2">
-                <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest leading-none">Condição / Status</label>
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none">Condição / Status</label>
                 <div className="flex flex-wrap gap-3">
                   {['Pronto para Venda', 'Com Defeito', 'Pendente'].map((status) => (
                     <label 
                       key={status}
                       className={cn(
                         "flex-1 min-w-[140px] flex items-center gap-2 p-2 border rounded-lg cursor-pointer transition-all",
-                        isDarkMode ? "bg-zinc-800 border-zinc-700 hover:bg-zinc-750" : "bg-zinc-50 border-zinc-100 hover:bg-zinc-200"
+                        isDarkMode ? "bg-slate-800 border-slate-700 hover:bg-slate-750" : "bg-slate-50 border-slate-100 hover:bg-slate-200"
                       )}
                     >
                       <input
@@ -222,7 +222,7 @@ const ProductModal: React.FC = () => {
                 }}
                 className={cn(
                   "flex-1 px-4 py-2.5 rounded-lg font-bold text-xs transition-all",
-                  isDarkMode ? "bg-zinc-800 hover:bg-zinc-700 text-white" : "bg-zinc-100 hover:bg-zinc-200 text-zinc-900"
+                  isDarkMode ? "bg-slate-800 hover:bg-slate-700 text-white" : "bg-slate-100 hover:bg-slate-200 text-slate-900"
                 )}
               >
                 Cancelar

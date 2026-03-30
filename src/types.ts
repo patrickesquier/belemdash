@@ -96,7 +96,14 @@ export interface LogEntry {
   timestamp: string;
   userId: string;
   userName: string;
-  action: 'create_sale' | 'update_sale' | 'delete_sale' | 'revert_sale' | 'cancel_sale' | 'system_backup' | 'system_restore' | 'create_customer' | 'update_customer' | 'delete_customer' | 'create_os' | 'update_os' | 'delete_os' | 'create_product' | 'update_product' | 'delete_product' | 'login' | 'logout' | 'error';
+  action: 'create_sale' | 'update_sale' | 'delete_sale' | 'revert_sale' | 'cancel_sale' | 'system_backup' | 'system_restore' | 'create_customer' | 'update_customer' | 'delete_customer' | 'create_os' | 'update_os' | 'delete_os' | 'create_product' | 'update_product' | 'delete_product' | 'login' | 'logout' | 'error' | 'create_seller' | 'update_seller' | 'delete_seller';
   details: string;
   payload?: any;
+}
+
+export interface Seller {
+  id: string;
+  name: string;
+  email?: string;
+  phone?: string;
 }

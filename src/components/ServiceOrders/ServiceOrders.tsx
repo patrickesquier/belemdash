@@ -38,7 +38,7 @@ const ServiceOrders: React.FC = () => {
       case 'Aprovado': return 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20';
       case 'Concluído': return 'text-blue-500 bg-blue-500/10 border-blue-500/20';
       case 'Cancelado': return 'text-red-500 bg-red-500/10 border-red-500/20';
-      default: return 'text-zinc-500 bg-zinc-500/10 border-zinc-500/20';
+      default: return 'text-slate-500 bg-slate-500/10 border-slate-500/20';
     }
   };
 
@@ -47,7 +47,7 @@ const ServiceOrders: React.FC = () => {
       case 'Alta': return 'text-red-500';
       case 'Média': return 'text-amber-500';
       case 'Baixa': return 'text-emerald-500';
-      default: return 'text-zinc-500';
+      default: return 'text-slate-500';
     }
   };
 
@@ -55,7 +55,7 @@ const ServiceOrders: React.FC = () => {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
         <div className="relative w-full md:w-96 group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-blue-500 transition-colors" size={20} />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-500 transition-colors" size={20} />
           <input
             type="text"
             placeholder="Pesquisar OS, cliente ou equipamento..."
@@ -64,8 +64,8 @@ const ServiceOrders: React.FC = () => {
             className={cn(
               "w-full pl-12 pr-4 py-4 rounded-2xl border outline-none transition-all font-medium",
               isDarkMode 
-                ? "bg-zinc-900 border-zinc-800 focus:border-blue-500 text-white" 
-                : "bg-white border-zinc-200 focus:border-blue-500 shadow-sm"
+                ? "bg-slate-900 border-slate-800 focus:border-blue-500 text-white" 
+                : "bg-white border-slate-200 focus:border-blue-500 shadow-sm"
             )}
           />
         </div>
@@ -90,7 +90,7 @@ const ServiceOrders: React.FC = () => {
         animate={{ opacity: 1 }}
         className={cn(
           "rounded-3xl border overflow-hidden transition-colors duration-300",
-          isDarkMode ? "bg-zinc-900 border-zinc-800" : "bg-white border-zinc-200 shadow-sm"
+          isDarkMode ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200 shadow-sm"
         )}
       >
         <div className="overflow-x-auto">
@@ -98,33 +98,33 @@ const ServiceOrders: React.FC = () => {
             <thead>
               <tr className={cn(
                 "border-b transition-colors duration-300",
-                isDarkMode ? "border-zinc-800 bg-zinc-800/50" : "border-zinc-100 bg-zinc-50"
+                isDarkMode ? "border-slate-800 bg-slate-800/50" : "border-slate-100 bg-slate-50"
               )}>
-                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-zinc-500">ID / Data</th>
-                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-zinc-500">Cliente / Equipamento</th>
-                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-zinc-500">Status</th>
-                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-zinc-500 hidden sm:table-cell">Prioridade</th>
-                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-zinc-500 hidden md:table-cell">Valor Est.</th>
-                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-zinc-500 text-right">Ações</th>
+                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">ID / Data</th>
+                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Cliente / Equipamento</th>
+                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Status</th>
+                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 hidden sm:table-cell">Prioridade</th>
+                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 hidden md:table-cell">Valor Est.</th>
+                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 text-right">Ações</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-800/10">
+            <tbody className="divide-y divide-slate-800/10">
               {filteredOS.map((os) => (
                 <tr
                   key={os.id}
                   className={cn(
                     "group transition-colors",
-                    isDarkMode ? "hover:bg-zinc-800/40" : "hover:bg-zinc-50"
+                    isDarkMode ? "hover:bg-slate-800/40" : "hover:bg-slate-50"
                   )}
                 >
                   <td className="px-6 py-4">
                     <div className="font-bold text-blue-500">{os.id}</div>
-                    <div className="text-[10px] text-zinc-500 font-mono uppercase">{new Date(os.entryDate).toLocaleDateString('pt-BR')}</div>
+                    <div className="text-[10px] text-slate-500 font-mono uppercase">{new Date(os.entryDate).toLocaleDateString('pt-BR')}</div>
                   </td>
                   <td className="px-6 py-4">
                     <div className="font-bold text-sm tracking-tight">{os.customerName}</div>
-                    <div className="text-[10px] text-zinc-500 flex items-center gap-1 font-bold uppercase">
-                      <ShieldCheck size={10} className="text-zinc-600" />
+                    <div className="text-[10px] text-slate-500 flex items-center gap-1 font-bold uppercase">
+                      <ShieldCheck size={10} className="text-slate-600" />
                       {os.equipment}
                     </div>
                     <div className="md:hidden text-[9px] text-blue-500 font-black uppercase mt-1">
@@ -158,7 +158,7 @@ const ServiceOrders: React.FC = () => {
                       <button
                         onClick={() => printServiceOrder(os, distributorName, distributorDescription, distributorLabel, distributorLogo, distributorIcon, distributorColor, distributorLogoBlend)}
                         title="Imprimir OS (Entrada)"
-                        className="p-2 hover:bg-zinc-500/10 text-zinc-500 rounded-xl transition-colors"
+                        className="p-2 hover:bg-slate-500/10 text-slate-500 rounded-xl transition-colors"
                       >
                         <Printer size={18} />
                       </button>
@@ -195,7 +195,7 @@ const ServiceOrders: React.FC = () => {
             </tbody>
           </table>
           {filteredOS.length === 0 && (
-            <div className="p-12 text-center text-zinc-500">Nenhuma ordem de serviço encontrada.</div>
+            <div className="p-12 text-center text-slate-500">Nenhuma ordem de serviço encontrada.</div>
           )}
         </div>
       </motion.div>

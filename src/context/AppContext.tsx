@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
-import { Product, Sale, Customer, ServiceOrder, User, LogEntry, SaleItem } from '../types';
+import { Product, Sale, Customer, ServiceOrder, User, LogEntry, SaleItem, Seller } from '../types';
 import * as Constants from '../constants';
 import { printInventory, printServiceOrder, printServiceReceipt, printSalesReport, printSaleReceipt } from '../utils/print';
 
@@ -11,6 +11,7 @@ interface AppContextType {
   customers: Customer[];
   serviceOrders: ServiceOrder[];
   users: User[];
+  sellers: Seller[];
   logs: LogEntry[];
   currentUser: User | null;
   token: string | null;
@@ -79,6 +80,7 @@ interface AppContextType {
   setCustomers: React.Dispatch<React.SetStateAction<Customer[]>>;
   setServiceOrders: React.Dispatch<React.SetStateAction<ServiceOrder[]>>;
   setUsers: React.Dispatch<React.SetStateAction<User[]>>;
+  setSellers: React.Dispatch<React.SetStateAction<Seller[]>>;
   setCurrentUser: React.Dispatch<React.SetStateAction<User | null>>;
   setToken: React.Dispatch<React.SetStateAction<string | null>>;
   setIsDarkMode: React.Dispatch<React.SetStateAction<boolean>>;
@@ -91,6 +93,7 @@ interface AppContextType {
   setIsCustomerModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setIsOSModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setIsUserModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsSellerModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setIsLogsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setIsCalculatorOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setIsNotificationsOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -100,6 +103,7 @@ interface AppContextType {
   setEditingCustomer: React.Dispatch<React.SetStateAction<Customer | null>>;
   setEditingOS: React.Dispatch<React.SetStateAction<ServiceOrder | null>>;
   setEditingUser: React.Dispatch<React.SetStateAction<User | null>>;
+  setEditingSeller: React.Dispatch<React.SetStateAction<Seller | null>>;
   setCart: React.Dispatch<React.SetStateAction<SaleItem[]>>;
   setSellerName: React.Dispatch<React.SetStateAction<string>>;
   setCustomerName: React.Dispatch<React.SetStateAction<string>>;
@@ -124,6 +128,7 @@ interface AppContextType {
   handleDeleteProduct: (id: string) => Promise<void>;
   handleDeleteCustomer: (id: string) => Promise<void>;
   handleSaveCustomer: (customerData: Partial<Customer>) => Promise<void>;
+  handleSaveSeller: (sellerData: Partial<Seller>) => Promise<void>;
   handleSaveOS: (osData: Partial<ServiceOrder>) => Promise<void>;
   handleSaveUser: () => Promise<void>;
   handleExportData: () => void;
@@ -131,6 +136,7 @@ interface AppContextType {
   handleRestoreSale: (sale: Sale) => Promise<void>;
   handleDeleteOS: (id: string) => Promise<void>;
   handleDeleteUser: (id: string) => Promise<void>;
+  handleDeleteSeller: (id: string) => Promise<void>;
   handleSaveProduct: (productData: any) => Promise<void>;
   handleSaveSale: () => Promise<void>;
   handleEditSale: (sale: Sale) => void;
@@ -157,6 +163,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [serviceOrders, setServiceOrders] = useState<ServiceOrder[]>([]);
   const [users, setUsers] = useState<User[]>([]);
+  const [sellers, setSellers] = useState<Seller[]>([]);
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
     const saved = localStorage.getItem(Constants.CURRENT_USER_KEY);
@@ -176,6 +183,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const [isOSModalOpen, setIsOSModalOpen] = useState(false);
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+  const [isSellerModalOpen, setIsSellerModalOpen] = useState(false);
   const [isLogsModalOpen, setIsLogsModalOpen] = useState(false);
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
@@ -189,6 +197,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [editingOS, setEditingOS] = useState<ServiceOrder | null>(null);
   const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [editingSeller, setEditingSeller] = useState<Seller | null>(null);
   const [cart, setCart] = useState<SaleItem[]>([]);
   const [sellerName, setSellerName] = useState('');
   const [customerName, setCustomerName] = useState('');
@@ -556,6 +565,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             distributorLogoBlend
           );
         }
+        // Update customer totalSpent
+        if (customerName) {
+          const matchedCustomer = customers.find(c =>
+            c.name === customerName ||
+            (customerCPF && c.cpf && c.cpf.replace(/\D/g, '') === customerCPF.replace(/\D/g, ''))
+          );
+          if (matchedCustomer) {
+            const updatedCustomer = {
+              ...matchedCustomer,
+              totalSpent: (matchedCustomer.totalSpent || 0) + finalValue
+            };
+            setCustomers(prev => prev.map(c => c.id === matchedCustomer.id ? updatedCustomer : c));
+            fetchWithAuth('/api/customers', {
+              method: 'POST',
+              body: JSON.stringify(updatedCustomer)
+            }).catch(err => console.error('Failed to update customer totalSpent', err));
+          }
+        }
       }
 
       setIsSalesModalOpen(false);
@@ -633,6 +660,58 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     } catch (err) {
       console.error('Failed to save customer', err);
       showNotification('Erro ao salvar no servidor. Verifique sua conexão.', 'error');
+    }
+  };
+
+  const handleSaveSeller = async (sellerData: Partial<Seller>) => {
+    let seller: Seller;
+    if (editingSeller) {
+      seller = { ...editingSeller, ...sellerData } as Seller;
+    } else {
+      seller = {
+        id: Math.random().toString(36).substr(2, 9),
+        name: sellerData.name || '',
+        email: sellerData.email,
+        phone: sellerData.phone,
+      };
+    }
+
+    try {
+      const res = await fetchWithAuth('/api/sellers', {
+        method: 'POST',
+        body: JSON.stringify(seller)
+      });
+      if (!res.ok) throw new Error('Failed to save seller');
+
+      if (editingSeller) {
+        setSellers(prev => prev.map(s => s.id === editingSeller.id ? seller : s));
+        showNotification('Vendedor atualizado com sucesso');
+        addLog('update_seller', `Vendedor atualizado: ${seller.name}`, seller);
+      } else {
+        setSellers(prev => [...prev, seller]);
+        showNotification('Vendedor cadastrado com sucesso');
+        addLog('create_seller', `Novo vendedor: ${seller.name}`, seller);
+      }
+      setIsSellerModalOpen(false);
+      setEditingSeller(null);
+    } catch (err) {
+      showNotification('Erro ao salvar vendedor', 'error');
+    }
+  };
+
+  const handleDeleteSeller = async (id: string) => {
+    const seller = sellers.find(s => s.id === id);
+    if (!seller) return;
+    if (!window.confirm(`Excluir vendedor ${seller.name}?`)) return;
+
+    try {
+      const res = await fetchWithAuth(`/api/sellers/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Failed to delete seller');
+      setSellers(prev => prev.filter(s => s.id !== id));
+      showNotification('Vendedor excluído com sucesso');
+      addLog('delete_seller', `Vendedor excluído: ${seller.name}`);
+    } catch (err) {
+      showNotification('Erro ao excluir vendedor', 'error');
     }
   };
 
@@ -947,9 +1026,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }, 0);
 
     const paymentData = [
-      { name: 'PIX', value: monthlySales.filter(s => s.paymentMethod === 'PIX').length },
-      { name: 'Cartão', value: monthlySales.filter(s => s.paymentMethod === 'Cartão').length },
-      { name: 'Dinheiro', value: monthlySales.filter(s => s.paymentMethod === 'Dinheiro').length },
+      { name: 'PIX', value: activeSales.filter(s => s.paymentMethod === 'PIX').length },
+      { name: 'Cartão', value: activeSales.filter(s => s.paymentMethod === 'Cartão').length },
+      { name: 'Dinheiro', value: activeSales.filter(s => s.paymentMethod === 'Dinheiro').length },
     ];
 
     const productSales: Record<string, number> = {};
@@ -1000,8 +1079,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setNewUserName, setNewUserUsername, setNewUserPassword, setNewUserRole, setLowStockThreshold,
     handleDeleteProduct, handleDeleteSale, handleDeleteCustomer, handleDeleteOS, handleDeleteUser, handleSaveProduct, handleSaveSale, handleEditSale, handleSaveCustomer, handleSaveOS, handleSaveUser,
     handleExportData, handleImportData, handleRestoreSale,
+    handleSaveSeller, handleDeleteSeller,
     showNotification, addLog, saveSetting, handleLogout,
-    stats, filteredProducts, notification, setNotification
+    stats, filteredProducts, notification, setNotification,
+    sellers, setSellers, isSellerModalOpen, setIsSellerModalOpen, editingSeller, setEditingSeller
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

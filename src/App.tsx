@@ -16,6 +16,7 @@ import Customers from './components/Customers/Customers';
 import ServiceOrders from './components/ServiceOrders/ServiceOrders';
 import Users from './components/Users/Users';
 import Settings from './components/Settings/Settings';
+import Sellers from './components/Sellers/Sellers';
 import Logs from './components/Logs/Logs';
 
 // Auth
@@ -42,10 +43,10 @@ const App: React.FC = () => {
     return (
       <div className={cn(
         "min-h-screen flex items-center justify-center flex-col gap-6",
-        isDarkMode ? "bg-zinc-950 text-white" : "bg-white text-zinc-900"
+        isDarkMode ? "bg-[#020617] text-white" : "bg-white text-slate-900"
       )}>
-        <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
-        <p className="text-xs font-black uppercase tracking-widest text-zinc-500 animate-pulse">
+        <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+        <p className="text-xs font-black uppercase tracking-widest text-slate-500 animate-pulse">
           Carregando Universo...
         </p>
       </div>
@@ -64,6 +65,7 @@ const App: React.FC = () => {
       case 'customers': return <Customers />;
       case 'os': return <ServiceOrders />;
       case 'users': return <Users />;
+      case 'sellers': return <Sellers />;
       case 'settings': return <Settings />;
       case 'logs': return <Logs />;
       default: return <Dashboard />;
@@ -73,7 +75,7 @@ const App: React.FC = () => {
   return (
     <div className={cn(
       "min-h-screen",
-      isDarkMode ? "bg-zinc-950 text-white" : "bg-white text-zinc-900"
+      isDarkMode ? "bg-[#020617] text-white" : "bg-white text-slate-900"
     )}>
       {/* Main Layout */}
       <Sidebar />

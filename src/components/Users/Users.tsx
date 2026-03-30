@@ -46,12 +46,12 @@ const Users: React.FC = () => {
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
         <div className="group flex flex-col">
           <h2 className="text-2xl font-black uppercase tracking-tighter">Gestão de Equipe</h2>
-          <p className="text-xs text-zinc-500 font-medium">Controle de acesso e colaboradores</p>
+          <p className="text-xs text-slate-500 font-medium">Controle de acesso e colaboradores</p>
         </div>
 
         <div className="flex items-center gap-3 w-full md:w-auto">
           <div className="relative flex-1 md:w-64 group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-blue-500 transition-colors" size={18} />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-500 transition-colors" size={18} />
             <input
               type="text"
               placeholder="Buscar colaborador..."
@@ -60,8 +60,8 @@ const Users: React.FC = () => {
               className={cn(
                 "w-full pl-11 pr-4 py-3 rounded-2xl border outline-none transition-all text-sm font-medium",
                 isDarkMode
-                  ? "bg-zinc-900 border-zinc-800 focus:border-blue-500 text-white"
-                  : "bg-white border-zinc-200 focus:border-blue-500 shadow-sm"
+                  ? "bg-slate-900 border-slate-800 focus:border-blue-500 text-white"
+                  : "bg-white border-slate-200 focus:border-blue-500 shadow-sm"
               )}
             />
           </div>
@@ -95,7 +95,7 @@ const Users: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             className={cn(
               "p-6 rounded-3xl border transition-all relative overflow-hidden group",
-              isDarkMode ? "bg-zinc-900 border-zinc-800 hover:border-blue-500/30" : "bg-white border-zinc-200 hover:border-blue-500/30 shadow-sm"
+              isDarkMode ? "bg-slate-900 border-slate-800 hover:border-blue-500/30" : "bg-white border-slate-200 hover:border-blue-500/30 shadow-sm"
             )}
           >
             {/* Background Icon Watermark */}
@@ -107,7 +107,7 @@ const Users: React.FC = () => {
               <div className="flex items-center gap-4">
                 <div className={cn(
                   "w-12 h-12 rounded-2xl flex items-center justify-center text-xl font-black",
-                  isDarkMode ? "bg-zinc-800 text-zinc-500" : "bg-zinc-100 text-zinc-400"
+                  isDarkMode ? "bg-slate-800 text-slate-500" : "bg-slate-100 text-slate-400"
                 )}>
                   {user.name.charAt(0).toUpperCase()}
                 </div>
@@ -118,7 +118,7 @@ const Users: React.FC = () => {
                       <span className="px-1.5 py-0.5 rounded-md bg-blue-500/10 text-blue-500 text-[8px] font-black uppercase">Você</span>
                     )}
                   </div>
-                  <div className="text-xs text-zinc-500 font-mono">@{user.username}</div>
+                  <div className="text-xs text-slate-500 font-mono">@{user.username}</div>
                 </div>
               </div>
               <span className={cn(
@@ -148,7 +148,7 @@ const Users: React.FC = () => {
           </motion.div>
         ))}
         {filteredUsers.length === 0 && (
-          <div className="col-span-full py-20 text-center text-zinc-500 italic">Nenhum colaborador encontrado.</div>
+          <div className="col-span-full py-20 text-center text-slate-500 italic">Nenhum colaborador encontrado.</div>
         )}
       </div>
 
