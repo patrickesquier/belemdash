@@ -13,7 +13,6 @@ const BottomNav: React.FC = () => {
     setActiveTab, 
     isDarkMode, 
     currentUser,
-    enableServices,
     distributorColor
   } = useApp();
 
@@ -27,7 +26,7 @@ const BottomNav: React.FC = () => {
   ];
 
   const moreItems = [
-    ...(enableServices ? [{ id: 'os', label: 'Ordens de Serviço', icon: Wrench }] : []),
+    { id: 'os', label: 'Ordens de Serviço', icon: Wrench },
     ...(currentUser?.role === 'admin' ? [{ id: 'logs', label: 'Audit / Logs', icon: FileText }] : []),
     ...(currentUser?.role === 'admin' || currentUser?.role === 'supervisor' ? [{ id: 'users', label: 'Usuários', icon: User }] : []),
     ...(currentUser?.role === 'admin' || currentUser?.role === 'supervisor' ? [{ id: 'sellers', label: 'Vendedores', icon: Users }] : []),

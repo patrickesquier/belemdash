@@ -165,6 +165,10 @@ const SalesModal: React.FC = () => {
     }));
   };
 
+  const updateWarranty = (productId: string, warranty: string) => {
+    setCart(prev => prev.map(item => item.productId === productId ? { ...item, warranty } : item));
+  };
+
   return (
     <AnimatePresence>
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -313,6 +317,18 @@ const SalesModal: React.FC = () => {
                               <button onClick={() => updateQuantity(item.productId, -1)} className="p-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400"><Minus size={14} /></button>
                               <span className="w-8 text-center font-bold text-sm">{item.quantity}</span>
                               <button onClick={() => updateQuantity(item.productId, 1)} className="p-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400"><Plus size={14} /></button>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-[10px] font-bold text-slate-500 uppercase">Garantia:</span>
+                              <input 
+                                type="text"
+                                value={item.warranty || '90 dias'}
+                                onChange={(e) => updateWarranty(item.productId, e.target.value)}
+                                className={cn(
+                                  "w-20 px-2 py-1 text-[10px] rounded focus:outline-none transition-all text-center",
+                                  isDarkMode ? "bg-slate-800 border-slate-700 text-white" : "bg-slate-100 border-slate-200 text-slate-900"
+                                )}
+                              />
                             </div>
                             <span className="font-bold text-blue-500">
                               {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.total)}

@@ -28,6 +28,8 @@ export interface ServiceOrder {
   observations?: string;
   servicePerformed?: string;
   items?: SaleItem[]; // Parts used in the service
+  paymentMethod?: 'PIX' | 'Cartão' | 'Dinheiro';
+  warranty?: string;
 }
 
 export interface SaleItem {

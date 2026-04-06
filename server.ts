@@ -365,6 +365,8 @@ protectedRouter.post("/service-orders", async (req, res) => {
       observations: o.observations,
       servicePerformed: o.servicePerformed,
       items: o.items,
+      paymentMethod: o.paymentMethod,
+      warranty: o.warranty,
     },
     create: {
       id: o.id,
@@ -383,6 +385,8 @@ protectedRouter.post("/service-orders", async (req, res) => {
       observations: o.observations,
       servicePerformed: o.servicePerformed,
       items: o.items,
+      paymentMethod: o.paymentMethod,
+      warranty: o.warranty,
     },
   });
   res.json({ success: true });

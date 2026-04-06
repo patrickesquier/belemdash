@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { X, User, Phone, FileText, Settings, AlertCircle, Clock, CheckCircle2, Package, Trash2, Plus, Minus, ClipboardList, PenTool, Search, ChevronDown } from 'lucide-react';
+import { X, User, Phone, FileText, Settings, AlertCircle, Clock, CheckCircle2, Package, Trash2, Plus, Minus, ClipboardList, PenTool, Search, ChevronDown, ShieldCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useApp } from '../../context/AppContext';
 import { cn } from '../../lib/utils';
@@ -29,6 +29,9 @@ const OSModal: React.FC = () => {
   const [priority, setPriority] = React.useState<'Baixa' | 'Média' | 'Alta'>(
     (editingOS?.priority as any) || 'Média'
   );
+  const [paymentMethod, setPaymentMethod] = React.useState<'PIX' | 'Cartão' | 'Dinheiro'>(
+    (editingOS?.paymentMethod as any) || 'PIX'
+  );
 
   // Autocomplete state
   const [nameSearch, setNameSearch] = useState('');
@@ -48,10 +51,12 @@ const OSModal: React.FC = () => {
   useEffect(() => {
     if (editingOS) {
       setPriority((editingOS.priority as any) || 'Média');
+      setPaymentMethod((editingOS.paymentMethod as any) || 'PIX');
       setOsCustomerName(editingOS.customerName || '');
       setOsCustomerPhone(editingOS.customerPhone || '');
       setOsCustomerCPF(editingOS.customerCPF || '');
       setNameSearch(editingOS.customerName || '');
+      setOsItems(editingOS.items || []);
       // Try to find linked customer
       const linked = customers.find(c =>
         c.name === editingOS.customerName ||
@@ -60,6 +65,7 @@ const OSModal: React.FC = () => {
       setSelectedCustomer(linked || null);
     } else {
       setPriority('Média');
+      setPaymentMethod('PIX');
     }
   }, [editingOS]);
 
@@ -152,6 +158,14 @@ const OSModal: React.FC = () => {
     }));
   };
 
+  const updateItemWarranty = (productId: string, warranty: string) => {
+    setOsItems(prev => prev.map(item =>
+      item.productId === productId ? { ...item, warranty } : item
+    ));
+  };
+
+  const partsTotal = osItems.reduce((acc, item) => acc + item.total, 0);
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!osCustomerName.trim()) {
@@ -169,6 +183,9 @@ const OSModal: React.FC = () => {
       estimatedCost: Number(formData.get('estimatedCost')),
       observations: formData.get('observations') as string,
       servicePerformed: formData.get('servicePerformed') as string,
+      paymentMethod: paymentMethod,
+      warranty: formData.get('warranty') as string,
+      items: osItems,
     });
   };
 
@@ -489,15 +506,37 @@ const OSModal: React.FC = () => {
                     ) : (
                       osItems.map(item => (
                         <div key={item.productId} className={cn(
-                          "p-2 rounded-xl border flex items-center justify-between gap-2",
-                          isDarkMode ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200"
+                          "p-3 rounded-xl border space-y-2",
+                          isDarkMode ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200 shadow-sm"
                         )}>
-                          <span className="text-[10px] font-bold truncate flex-1">{item.name}</span>
-                          <div className="flex items-center gap-1.5">
-                            <button type="button" onClick={() => updateItemQuantity(item.productId, -1)} className="p-0.5 rounded-md bg-slate-800"><Minus size={10} /></button>
-                            <span className="text-[10px] font-black w-4 text-center">{item.quantity}</span>
-                            <button type="button" onClick={() => updateItemQuantity(item.productId, 1)} className="p-0.5 rounded-md bg-slate-800"><Plus size={10} /></button>
-                            <button type="button" onClick={() => removeItemFromOS(item.productId)} className="text-red-500 ml-1"><Trash2 size={12} /></button>
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="text-[10px] font-black uppercase truncate flex-1">{item.name}</span>
+                            <div className="flex items-center gap-1.5">
+                              <button type="button" onClick={() => updateItemQuantity(item.productId, -1)} className="p-1 rounded-md bg-slate-800 text-white hover:bg-blue-600 transition-colors"><Minus size={10} /></button>
+                              <span className="text-xs font-black w-4 text-center">{item.quantity}</span>
+                              <button type="button" onClick={() => updateItemQuantity(item.productId, 1)} className="p-1 rounded-md bg-slate-800 text-white hover:bg-blue-600 transition-colors"><Plus size={10} /></button>
+                              <button type="button" onClick={() => removeItemFromOS(item.productId)} className="text-red-500 ml-1 hover:scale-110 transition-transform"><Trash2 size={12} /></button>
+                            </div>
+                          </div>
+                          <div className="flex flex-col gap-2">
+                             <div className="flex items-center justify-between">
+                               <label className="text-[9px] font-bold text-slate-500 uppercase tracking-tighter">Garantia Peça</label>
+                               <span className="text-[10px] font-black text-blue-500">
+                                 {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.total)}
+                               </span>
+                             </div>
+                             <div className="relative">
+                               <ShieldCheck className="absolute left-2 top-1/2 -translate-y-1/2 text-blue-500" size={10} />
+                               <input
+                                 value={item.warranty}
+                                 onChange={(e) => updateItemWarranty(item.productId, e.target.value)}
+                                 className={cn(
+                                   "w-full pl-7 pr-2 py-1.5 rounded-lg border text-[10px] font-bold outline-none transition-all",
+                                   isDarkMode ? "bg-slate-950 border-slate-800 text-blue-400 focus:border-blue-500" : "bg-slate-50 border-slate-200 text-blue-600 focus:border-blue-500"
+                                 )}
+                                 placeholder="Ex: 90 dias"
+                               />
+                             </div>
                           </div>
                         </div>
                       ))
@@ -587,10 +626,63 @@ const OSModal: React.FC = () => {
                       defaultValue={editingOS?.estimatedCost}
                       className={cn(
                         "w-full px-4 py-2.5 rounded-xl border outline-none transition-all text-sm font-bold",
-                        isDarkMode ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200"
+                        isDarkMode ? "bg-slate-900 border-slate-800 text-emerald-500" : "bg-white border-slate-200 text-emerald-600"
                       )}
                       placeholder="0,00"
                     />
+                  </div>
+
+                  <div className="space-y-1.5 focus-within:text-blue-500 transition-colors">
+                    <label className="text-[10px] font-bold uppercase text-slate-500 ml-1">Garantia do Serviço</label>
+                    <div className="relative">
+                      <ShieldCheck className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-500" size={16} />
+                      <input
+                        name="warranty"
+                        defaultValue={editingOS?.warranty}
+                        className={cn(
+                          "w-full pl-10 pr-4 py-2.5 rounded-xl border outline-none transition-all text-sm font-bold",
+                          isDarkMode ? "bg-slate-900 border-slate-800 text-blue-400 focus:border-blue-500" : "bg-white border-slate-200 text-blue-600 focus:border-blue-500"
+                        )}
+                        placeholder="Ex: 90 dias para serviço"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Financial Summary Box */}
+                  <div className={cn(
+                    "p-4 rounded-2xl border space-y-3",
+                    isDarkMode ? "bg-slate-950 border-slate-800" : "bg-white border-slate-200 shadow-sm"
+                  )}>
+                    <div className="flex justify-between items-center text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                      <span>Total Peças</span>
+                      <span>{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(partsTotal)}</span>
+                    </div>
+                    <div className="h-px bg-slate-800/50" />
+                    <div className="flex justify-between items-center">
+                      <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest">Total Geral Est.</span>
+                      <span className="text-lg font-black text-blue-500">
+                        {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(partsTotal + (editingOS?.estimatedCost || 0))}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold uppercase text-slate-500 ml-1">Forma de Pagamento</label>
+                    <div className="flex gap-2">
+                      {(['PIX', 'Cartão', 'Dinheiro'] as const).map(p => (
+                        <button
+                          key={p}
+                          type="button"
+                          onClick={() => setPaymentMethod(p)}
+                          className={cn(
+                            "flex-1 py-2 rounded-xl text-[10px] font-black uppercase transition-all border",
+                            p === paymentMethod ? "border-blue-500 text-blue-500 bg-blue-500/10 shadow-sm" : (isDarkMode ? "border-slate-800 text-slate-500 bg-slate-900" : "border-slate-200 text-slate-400 bg-white"),
+                            "hover:scale-[1.05] active:scale-[0.95]"
+                          )}
+                        >
+                          {p}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>

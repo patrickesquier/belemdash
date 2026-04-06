@@ -32,6 +32,7 @@ interface AppContextType {
   isLogsModalOpen: boolean;
   isCalculatorOpen: boolean;
   isNotificationsOpen: boolean;
+  isSellerModalOpen: boolean;
 
   // Editing States
   editingProduct: Product | null;
@@ -39,6 +40,7 @@ interface AppContextType {
   editingCustomer: Customer | null;
   editingOS: ServiceOrder | null;
   editingUser: User | null;
+  editingSeller: Seller | null;
   cart: SaleItem[];
   sellerName: string;
   customerName: string;
@@ -178,7 +180,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   });
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
-  const [enableServices, setEnableServices] = useState(false);
+  const [enableServices, setEnableServices] = useState(true);
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   const [isOSModalOpen, setIsOSModalOpen] = useState(false);
@@ -296,7 +298,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           if (settingsRes.appIcon) setAppIcon(settingsRes.appIcon);
           if (settingsRes.lowStockThreshold) setLowStockThreshold(Number(settingsRes.lowStockThreshold));
           if (settingsRes.warrantyTerm) setWarrantyTerm(settingsRes.warrantyTerm);
-          if (settingsRes.enableServices) setEnableServices(settingsRes.enableServices === 'true' || settingsRes.enableServices === true);
+          setEnableServices(true);
         }
 
         setIsDataLoaded(true);
@@ -310,6 +312,34 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     loadData();
   }, [token, fetchWithAuth, showNotification]);
+
+  // Dynamic calculation for Customer Total Spent across Sales and OS
+  useEffect(() => {
+    if (!isDataLoaded) return;
+
+    setCustomers(prev => prev.map(customer => {
+      const customerSales = sales.filter(s => 
+        (s.customerCPF === customer.cpf) && 
+        s.status !== 'cancelled'
+      );
+      
+      const customerOS = serviceOrders.filter(os => 
+        (os.customerCPF === customer.cpf || os.customerName === customer.name) && 
+        (os.status === 'Concluído' || os.status === 'Entregue')
+      );
+
+      const salesTotal = customerSales.reduce((acc, s) => acc + s.finalValue, 0);
+      const osTotal = customerOS.reduce((acc, os) => {
+        const itemsTotal = (os.items || []).reduce((sum: number, item: any) => sum + item.total, 0);
+        return acc + itemsTotal + (os.estimatedCost || 0);
+      }, 0);
+
+      return {
+        ...customer,
+        totalSpent: salesTotal + osTotal
+      };
+    }));
+  }, [sales, serviceOrders, isDataLoaded]);
 
   const addLog = async (action: LogEntry['action'], details: string, payload?: any) => {
     const newLog: LogEntry = {
@@ -471,26 +501,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     let sale: Sale;
     if (editingSale) {
-      // Revert stock for old sale items first
-      const restoredProducts = products.map(p => {
-        const oldItem = editingSale.items.find(item => item.productId === p.id);
-        if (oldItem && !p.isService) {
-          return { ...p, quantity: p.quantity + oldItem.quantity };
-        }
-        return p;
-      });
-
-      // Apply new sale items
-      const updatedProducts = restoredProducts.map(p => {
-        const newItem = cart.find(item => item.productId === p.id);
-        if (newItem && !p.isService) {
-          return { ...p, quantity: p.quantity - newItem.quantity };
-        }
-        return p;
-      });
-
-      setProducts(updatedProducts);
-
       sale = {
         ...editingSale,
         items: cart,
@@ -522,6 +532,34 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         status: 'active'
       };
     }
+    // --- Inventory Adjustment Logic ---
+    let updatedProducts = [...products];
+    const inventoryChanges: { productId: string; newQty: number }[] = [];
+
+    if (editingSale) {
+      editingSale.items.forEach(oldItem => {
+         const product = updatedProducts.find(p => p.id === oldItem.productId);
+         if (product && !product.isService) {
+           const newQty = product.quantity + oldItem.quantity;
+           updatedProducts = updatedProducts.map(p => p.id === oldItem.productId ? { ...p, quantity: newQty } : p);
+         }
+      });
+    }
+
+    cart.forEach(newItem => {
+      const product = updatedProducts.find(p => p.id === newItem.productId);
+      if (product && !product.isService) {
+        const newQty = Math.max(0, product.quantity - newItem.quantity);
+        updatedProducts = updatedProducts.map(p => p.id === newItem.productId ? { ...p, quantity: newQty } : p);
+      }
+    });
+
+    products.forEach(p => {
+      const updated = updatedProducts.find(up => up.id === p.id);
+      if (updated && updated.quantity !== p.quantity) {
+        inventoryChanges.push({ productId: p.id, newQty: updated.quantity });
+      }
+    });
 
     try {
       const res = await fetchWithAuth('/api/sales', {
@@ -529,10 +567,26 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         body: JSON.stringify(sale)
       });
 
-      if (!res.ok) {
-        throw new Error(`Erro ao salvar venda: ${res.statusText}`);
-      }
+      if (!res.ok) throw new Error(`Erro ao salvar venda: ${res.statusText}`);
 
+      if (inventoryChanges.length > 0) {
+        setProducts(updatedProducts);
+        const updatePromises = inventoryChanges.map(async change => {
+          const fullProduct = updatedProducts.find(p => p.id === change.productId);
+          if (fullProduct) {
+            return fetchWithAuth('/api/products', {
+              method: 'POST',
+              body: JSON.stringify(fullProduct)
+            });
+          }
+        });
+        await Promise.all(updatePromises);
+      }
+    } catch (err) {
+      console.error('Failed to sync inventory', err);
+    }
+
+    try {
       if (editingSale) {
         setSales(prev => prev.map(s => s.id === editingSale.id ? sale : s));
         showNotification('Venda atualizada com sucesso!');
@@ -541,47 +595,39 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setSales(prev => [sale, ...prev]);
         showNotification('Venda realizada com sucesso!');
         addLog('create_sale', `Venda ${sale.id} realizada`, sale);
+      }
 
-        // Update product quantities locally
-        const updatedProducts = products.map(p => {
-          const item = (cart as any).find((i: any) => i.productId === p.id);
-          if (item && !p.isService) {
-            return { ...p, quantity: p.quantity - item.quantity };
-          }
-          return p;
-        });
-        setProducts(updatedProducts);
+      const { printSaleReceipt } = await import('../utils/print');
+      if (window.confirm('Venda realizada! Deseja imprimir o comprovante/garantia?')) {
+        printSaleReceipt(
+          sale,
+          distributorName,
+          distributorDescription,
+          distributorLabel,
+          distributorLogo || null,
+          distributorIcon,
+          distributorColor,
+          warrantyTerm,
+          distributorLogoBlend
+        );
+      }
 
-        if (window.confirm('Venda realizada! Deseja imprimir o comprovante/garantia?')) {
-          printSaleReceipt(
-            sale,
-            distributorName,
-            distributorDescription,
-            distributorLabel,
-            distributorLogo || null,
-            distributorIcon,
-            distributorColor,
-            warrantyTerm,
-            distributorLogoBlend
-          );
-        }
-        // Update customer totalSpent
-        if (customerName) {
-          const matchedCustomer = customers.find(c =>
-            c.name === customerName ||
-            (customerCPF && c.cpf && c.cpf.replace(/\D/g, '') === customerCPF.replace(/\D/g, ''))
-          );
-          if (matchedCustomer) {
-            const updatedCustomer = {
-              ...matchedCustomer,
-              totalSpent: (matchedCustomer.totalSpent || 0) + finalValue
-            };
-            setCustomers(prev => prev.map(c => c.id === matchedCustomer.id ? updatedCustomer : c));
-            fetchWithAuth('/api/customers', {
-              method: 'POST',
-              body: JSON.stringify(updatedCustomer)
-            }).catch(err => console.error('Failed to update customer totalSpent', err));
-          }
+      // Update customer totalSpent
+      if (customerName) {
+        const matchedCustomer = customers.find(c =>
+          c.name === customerName ||
+          (customerCPF && c.cpf && c.cpf.replace(/\D/g, '') === customerCPF.replace(/\D/g, ''))
+        );
+        if (matchedCustomer) {
+          const updatedCustomer = {
+            ...matchedCustomer,
+            totalSpent: (matchedCustomer.totalSpent || 0) + finalValue
+          };
+          setCustomers(prev => prev.map(c => c.id === matchedCustomer.id ? updatedCustomer : c));
+          fetchWithAuth('/api/customers', {
+            method: 'POST',
+            body: JSON.stringify(updatedCustomer)
+          }).catch(err => console.error('Failed to update customer totalSpent', err));
         }
       }
 
@@ -716,10 +762,26 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const handleDeleteOS = async (id: string) => {
+    const osToDelete = serviceOrders.find(os => os.id === id);
     if (!window.confirm('Tem certeza que deseja excluir esta ordem de serviço?')) return;
     try {
       const res = await fetchWithAuth(`/api/service-orders/${id}`, { method: 'DELETE' });
       if (res.ok) {
+        // Return items to stock
+        if (osToDelete && osToDelete.items) {
+          osToDelete.items.forEach(async item => {
+            const product = products.find(p => p.id === item.productId);
+            if (product && !product.isService) {
+              const newQty = product.quantity + item.quantity;
+              setProducts(prev => prev.map(p => p.id === item.productId ? { ...p, quantity: newQty } : p));
+              await fetchWithAuth('/api/products', {
+                method: 'POST',
+                body: JSON.stringify({ ...product, quantity: newQty })
+              });
+            }
+          });
+        }
+
         setServiceOrders(prev => prev.filter(os => os.id !== id));
         showNotification('OS excluída com sucesso');
         addLog('delete_os', `OS ID ${id} excluída`);
@@ -760,9 +822,62 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         estimatedCost: osData.estimatedCost,
         observations: osData.observations || '',
         servicePerformed: osData.servicePerformed || '',
+        warranty: osData.warranty,
         items: osItems,
       };
     }
+
+    // --- Inventory Adjustment Logic ---
+    // Calculate new stock levels
+    let updatedProducts = [...products];
+    const originalItems = editingOS?.items || [];
+    const newItems = osItems;
+    const inventoryChanges: { productId: string; newQty: number }[] = [];
+
+    // 1. Handle new/updated items
+    newItems.forEach(newItem => {
+      const product = updatedProducts.find(p => p.id === newItem.productId);
+      if (product && !product.isService) {
+        const oldItem = originalItems.find(o => o.productId === newItem.productId);
+        const oldQty = oldItem ? oldItem.quantity : 0;
+        const diff = newItem.quantity - oldQty;
+        if (diff !== 0) {
+          const newQty = Math.max(0, product.quantity - diff);
+          updatedProducts = updatedProducts.map(p => p.id === newItem.productId ? { ...p, quantity: newQty } : p);
+          inventoryChanges.push({ productId: newItem.productId, newQty });
+        }
+      }
+    });
+
+    // 2. Handle items removed entirely
+    originalItems.forEach(oldItem => {
+      const stillExists = newItems.find(n => n.productId === oldItem.productId);
+      if (!stillExists) {
+        const product = updatedProducts.find(p => p.id === oldItem.productId);
+        if (product && !product.isService) {
+          const newQty = product.quantity + oldItem.quantity;
+          updatedProducts = updatedProducts.map(p => p.id === oldItem.productId ? { ...p, quantity: newQty } : p);
+          inventoryChanges.push({ productId: oldItem.productId, newQty });
+        }
+      }
+    });
+
+    // Apply state change once
+    if (inventoryChanges.length > 0) {
+      setProducts(updatedProducts);
+      // Persist changes to backend
+      const updatePromises = inventoryChanges.map(async change => {
+        const fullProduct = updatedProducts.find(p => p.id === change.productId);
+        if (fullProduct) {
+          return fetchWithAuth('/api/products', {
+            method: 'POST',
+            body: JSON.stringify(fullProduct)
+          });
+        }
+      });
+      await Promise.all(updatePromises);
+    }
+    // ----------------------------------
 
     try {
       const res = await fetchWithAuth('/api/service-orders', {
@@ -1009,13 +1124,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const currentYear = new Date().getFullYear();
 
     const activeSales = safeSales.filter(s => s.status !== 'cancelled');
+    const closedOS = safeOS.filter(os => os.status === 'Concluído' || os.status === 'Entregue');
+
+    const getOSValue = (os: ServiceOrder) => {
+      const itemsTotal = (os.items || []).reduce((acc: number, item: any) => acc + item.total, 0);
+      return itemsTotal + (os.estimatedCost || 0);
+    };
+
     const monthlySales = activeSales.filter(s => {
       const d = new Date(s.timestamp);
       return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
     });
+    const monthlyOS = closedOS.filter(os => {
+      const d = new Date(os.entryDate);
+      return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+    });
 
-    const totalRevenue = activeSales.reduce((acc, s) => acc + s.finalValue, 0);
-    const monthlyRevenue = monthlySales.reduce((acc, s) => acc + s.finalValue, 0);
+    const totalRevenue = activeSales.reduce((acc, s) => acc + s.finalValue, 0) + closedOS.reduce((acc, os) => acc + getOSValue(os), 0);
+    const monthlyRevenue = monthlySales.reduce((acc, s) => acc + s.finalValue, 0) + monthlyOS.reduce((acc, os) => acc + getOSValue(os), 0);
 
     const monthlyProfit = monthlySales.reduce((acc, sale) => {
       const saleProfit = (sale.items || []).reduce((itemAcc, item) => {
@@ -1023,12 +1149,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         return itemAcc + (item.unitPrice - cost) * item.quantity;
       }, 0);
       return acc + saleProfit - (sale.discount || 0);
+    }, 0) + monthlyOS.reduce((acc, os) => {
+      const osProfit = (os.items || []).reduce((itemAcc: number, item: any) => {
+        const cost = item.costPrice || 0;
+        return itemAcc + (item.unitPrice - cost) * item.quantity;
+      }, 0);
+      return acc + osProfit + (os.estimatedCost || 0);
     }, 0);
 
     const paymentData = [
-      { name: 'PIX', value: activeSales.filter(s => s.paymentMethod === 'PIX').length },
-      { name: 'Cartão', value: activeSales.filter(s => s.paymentMethod === 'Cartão').length },
-      { name: 'Dinheiro', value: activeSales.filter(s => s.paymentMethod === 'Dinheiro').length },
+      { name: 'PIX', value: activeSales.filter(s => s.paymentMethod === 'PIX').length + closedOS.filter(os => os.paymentMethod === 'PIX').length },
+      { name: 'Cartão', value: activeSales.filter(s => s.paymentMethod === 'Cartão').length + closedOS.filter(os => os.paymentMethod === 'Cartão').length },
+      { name: 'Dinheiro', value: activeSales.filter(s => s.paymentMethod === 'Dinheiro').length + closedOS.filter(os => os.paymentMethod === 'Dinheiro').length },
     ];
 
     const productSales: Record<string, number> = {};
@@ -1047,7 +1179,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       d.setDate(d.getDate() - i);
       const dateStr = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
       const daySales = activeSales.filter(s => new Date(s.timestamp).toLocaleDateString() === d.toLocaleDateString());
-      const total = daySales.reduce((acc, s) => acc + s.finalValue, 0);
+      const dayOS = closedOS.filter(os => new Date(os.entryDate).toLocaleDateString() === d.toLocaleDateString());
+      const total = daySales.reduce((acc, s) => acc + s.finalValue, 0) + dayOS.reduce((acc, os) => acc + getOSValue(os), 0);
       return { name: dateStr, total, date: d };
     }).reverse();
 

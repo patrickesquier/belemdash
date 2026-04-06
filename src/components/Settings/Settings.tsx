@@ -39,7 +39,7 @@ const Settings: React.FC = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 pb-12">
+    <div className="w-full space-y-8 pb-12">
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center text-blue-500">
           <SettingsIcon size={20} />
@@ -57,9 +57,9 @@ const Settings: React.FC = () => {
           isDarkMode ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200 shadow-sm"
         )}>
           <div className="w-48 h-48 relative group">
-            <img 
-              src={belemLogo} 
-              alt="Logo Belém TI" 
+            <img
+              src={belemLogo}
+              alt="Logo Belém TI"
               className="w-full h-full object-contain filter drop-shadow-2xl transition-transform duration-500 group-hover:scale-110"
             />
             <div className="absolute -inset-4 bg-blue-500/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
@@ -76,7 +76,7 @@ const Settings: React.FC = () => {
 
         {/* System Behavior */}
         <div className={cn(
-          "p-5 rounded-xl border space-y-6",
+          "md:col-span-2 p-5 rounded-xl border space-y-6",
           isDarkMode ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200 shadow-sm"
         )}>
           <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-500 flex items-center gap-2">
@@ -97,23 +97,6 @@ const Settings: React.FC = () => {
               />
             </div>
 
-            <div className="flex items-center justify-between p-4 rounded-xl bg-blue-500/5 border border-blue-500/10">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500">
-                  <Shield size={16} />
-                </div>
-                <div>
-                  <div className="text-xs font-bold uppercase tracking-widest">Módulo de Serviços</div>
-                  <div className="text-[9px] text-slate-500 uppercase font-medium">Habilitar Ordens de Serviço</div>
-                </div>
-              </div>
-              <input
-                type="checkbox"
-                defaultChecked={enableServices}
-                onChange={(e) => handleSave('enableServices', e.target.checked)}
-                className="w-5 h-5 accent-blue-500"
-              />
-            </div>
 
             <div className="space-y-1.5">
               <label className="text-[10px] font-bold uppercase text-slate-500">Termo de Garantia Padrão</label>
@@ -138,7 +121,7 @@ const Settings: React.FC = () => {
           <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-500 flex items-center gap-2">
             <Database size={12} /> Manutenção e Backup
           </h3>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="p-4 rounded-xl bg-amber-500/5 border border-amber-500/10 flex items-center gap-4">
               <div className="w-10 h-10 bg-amber-500/10 rounded-lg flex items-center justify-center text-amber-500">

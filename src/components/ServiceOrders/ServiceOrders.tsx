@@ -104,7 +104,7 @@ const ServiceOrders: React.FC = () => {
                 <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Cliente / Equipamento</th>
                 <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Status</th>
                 <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 hidden sm:table-cell">Prioridade</th>
-                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 hidden md:table-cell">Valor Est.</th>
+                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 hidden md:table-cell">Total (Serviço + Peças)</th>
                 <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 text-right">Ações</th>
               </tr>
             </thead>
@@ -150,7 +150,9 @@ const ServiceOrders: React.FC = () => {
                   </td>
                   <td className="px-6 py-4 hidden md:table-cell">
                     <div className="font-bold text-blue-500">
-                      {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(os.estimatedCost || 0)}
+                      {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(
+                        (os.estimatedCost || 0) + (os.items || []).reduce((acc: number, item: any) => acc + item.total, 0)
+                      )}
                     </div>
                   </td>
                   <td className="px-6 py-4 text-right">

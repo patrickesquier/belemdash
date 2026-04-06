@@ -96,6 +96,8 @@ model ServiceOrder {
   observations       String?
   servicePerformed   String?
   items              Json?
+  paymentMethod      String?
+  warranty           String?
 }
 
 model User {

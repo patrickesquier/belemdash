@@ -217,7 +217,8 @@ export const printServiceOrder = (
           <div>
             <p style="margin: 0; font-size: 10px; text-transform: uppercase; color: #3b82f6; font-weight: 900; letter-spacing: 0.1em;">${label}</p>
             <h1>${distributor}</h1>
-            <p>${description}</p>
+            <p style="margin: 4px 0 2px; font-weight: 700;">${description}</p>
+            <p style="margin: 0; font-size: 9px; line-height: 1.3;">CNPJ: 65.399.186/0001-49<br/>Endereço: AV Agamenon magalhães 1780</p>
           </div>
         </div>
         <div class="os-badge">
@@ -268,6 +269,12 @@ export const printServiceOrder = (
               <td class="status-label">Custo Est.:</td>
               <td><strong class="highlight">${os.estimatedCost ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(os.estimatedCost) : 'A definir'}</strong></td>
             </tr>
+            ${os.warranty ? `
+            <tr>
+              <td class="status-label">Garantia Serv.:</td>
+              <td colspan="3"><strong style="color: #3b82f6;">${os.warranty}</strong></td>
+            </tr>
+            ` : ''}
           </table>
         </div>
       </div>
@@ -288,11 +295,6 @@ export const printServiceOrder = (
         3. A garantia legal é de 90 dias e cobre apenas os serviços executados e peças efetivamente substituídas. 
         4. O backup dos dados é de inteira responsabilidade do cliente. Não nos responsabilizamos por perdas de informações ou softwares.
         5. A retirada do equipamento só será permitida mediante apresentação desta Ordem de Serviço ou documento de identidade do titular.
-      </div>
-
-      <div class="signatures">
-        <div class="signature-line">ASSINATURA DO CLIENTE</div>
-        <div class="signature-line">CARIMBO / ASSINATURA DA EMPRESA</div>
       </div>
 
       <div class="footer">
@@ -343,7 +345,7 @@ export const printServiceReceipt = (
     <tr>
       <td style="padding: 6px; border: 1px solid #ddd;">${item.name}</td>
       <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">${item.quantity}</td>
-      <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">90 Dias</td>
+      <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">${item.warranty || '90 Dias'}</td>
       <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.unitPrice)}</td>
       <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.total)}</td>
     </tr>
@@ -353,7 +355,7 @@ export const printServiceReceipt = (
     <tr>
       <td style="padding: 6px; border: 1px solid #ddd;">${os.servicePerformed || 'Mão de Obra / Serviço Técnico'}</td>
       <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">1</td>
-      <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">90 Dias</td>
+      <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">${os.warranty || '90 Dias'}</td>
       <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(os.estimatedCost || 0)}</td>
       <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(os.estimatedCost || 0)}</td>
     </tr>
@@ -414,7 +416,8 @@ export const printServiceReceipt = (
           <div>
             <p style="margin: 0; font-size: 10px; text-transform: uppercase; color: #10b981; font-weight: 900; letter-spacing: 0.1em;">${label}</p>
             <h1>${distributor}</h1>
-            <p>${description}</p>
+            <p style="margin: 4px 0 2px; font-weight: 700;">${description}</p>
+            <p style="margin: 0; font-size: 9px; line-height: 1.3;">CNPJ: 65.399.186/0001-49<br/>Endereço: AV Agamenon magalhães 1780</p>
           </div>
         </div>
         <div class="doc-badge">
@@ -479,11 +482,6 @@ export const printServiceReceipt = (
       <div class="warranty">
         <h3>Termo de Garantia</h3>
         <p>${warrantyTerm}</p>
-      </div>
-
-      <div class="signatures">
-        <div class="signature-line">DATA E ASSINATURA DO CLIENTE</div>
-        <div class="signature-line">ASSINATURA DO RESPONSÁVEL</div>
       </div>
 
       <div class="footer">
@@ -731,7 +729,8 @@ export const printSaleReceipt = (
           <div>
             <p style="margin: 0; font-size: 10px; text-transform: uppercase; color: #111827; font-weight: 900; letter-spacing: 0.1em;">${label}</p>
             <h1>${distributor}</h1>
-            <p>${description}</p>
+            <p style="margin: 4px 0 2px; font-weight: 700;">${description}</p>
+            <p style="margin: 0; font-size: 9px; line-height: 1.3;">CNPJ: 65.399.186/0001-49<br/>Endereço: AV Agamenon magalhães 1780</p>
           </div>
         </div>
         <div class="doc-badge">
@@ -745,16 +744,16 @@ export const printSaleReceipt = (
         <div class="section">
           <div class="section-header">Dados do Cliente</div>
           <div class="section-content">
-            <div class="info-row"><span class="info-label">Nome:</span> <span class="info-value">${sale.customerName || 'Consumidor Final'}</span></div>
-            <div class="info-row"><span class="info-label">Telefone:</span> <span class="info-value">${sale.customerPhone || 'Não informado'}</span></div>
-            <div class="info-row"><span class="info-label">CPF/CNPJ:</span> <span class="info-value">${sale.customerCPF || 'Não informado'}</span></div>
+            <div class="info-row"><span class="info-label">&nbsp &nbsp Nome:</span> <span class="info-value">${sale.customerName || 'Consumidor Final'}</span></div>
+            <div class="info-row"><span class="info-label">&nbsp &nbsp Telefone:</span> <span class="info-value">${sale.customerPhone || 'Não informado'}</span></div>
+            <div class="info-row"><span class="info-label">&nbsp &nbsp CPF/CNPJ:</span> <span class="info-value">${sale.customerCPF || 'Não informado'}</span></div>
           </div>
         </div>
         <div class="section">
           <div class="section-header">Informações da Venda</div>
           <div class="section-content">
-            <div class="info-row"><span class="info-label">Vendedor:</span> <span class="info-value">${sale.seller}</span></div>
-            <div class="info-row"><span class="info-label">Pagamento:</span> <span class="info-value" style="color: #6366f1;">${sale.paymentMethod}</span></div>
+            <div class="info-row"><span class="info-label">&nbsp &nbsp Vendedor:</span> <span class="info-value">${sale.seller}</span></div>
+            <div class="info-row"><span class="info-label">&nbsp &nbsp Pagamento:</span> <span class="info-value" style="color: #6366f1;">${sale.paymentMethod}</span></div>
           </div>
         </div>
       </div>
@@ -791,11 +790,6 @@ export const printSaleReceipt = (
       <div class="warranty">
         <h3>Termo de Garantia e Condições</h3>
         <p>${warrantyTerm}</p>
-      </div>
-
-      <div class="signatures">
-        <div class="signature-line">DATA E ASSINATURA DO CLIENTE</div>
-        <div class="signature-line">RESPONSÁVEL PELA VENDA</div>
       </div>
 
       <div class="footer">

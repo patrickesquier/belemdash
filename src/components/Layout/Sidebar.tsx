@@ -16,7 +16,6 @@ const Sidebar: React.FC = () => {
     setIsDarkMode,
     handleLogout,
     currentUser,
-    enableServices,
     appName,
     distributorColor
   } = useApp();
@@ -26,10 +25,10 @@ const Sidebar: React.FC = () => {
     { id: 'inventory', label: 'Estoque', icon: Package },
     { id: 'sales', label: 'Vendas', icon: ShoppingCart },
     { id: 'customers', label: 'Clientes', icon: Users },
-    ...(enableServices ? [{ id: 'os', label: 'Ordens de Serviço', icon: Wrench }] : []),
+    { id: 'os', label: 'Ordens de Serviço', icon: Wrench },
+    ...(currentUser?.role === 'admin' || currentUser?.role === 'supervisor' ? [{ id: 'sellers', label: 'Vendedores', icon: Users }] : []),
     ...(currentUser?.role === 'admin' ? [{ id: 'logs', label: 'Audit / Logs', icon: FileText }] : []),
     ...(currentUser?.role === 'admin' || currentUser?.role === 'supervisor' ? [{ id: 'users', label: 'Usuários', icon: User }] : []),
-    ...(currentUser?.role === 'admin' || currentUser?.role === 'supervisor' ? [{ id: 'sellers', label: 'Vendedores', icon: Users }] : []),
     ...(currentUser?.role === 'admin' ? [{ id: 'settings', label: 'Configurações', icon: Settings }] : []),
   ];
 
